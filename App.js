@@ -1,62 +1,51 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Home, Map, Setting} from './screens';
+import * as eva from '@eva-design/eva';
+import {ApplicationProvider} from '@ui-kitten/components';
+import {BottomTab, Detail, MapDetail} from './screens';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const TotalStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="bottom-tab">
+      <Stack.Screen
+        name="bottom-tab"
+        component={BottomTab}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="detail"
+        component={Detail}
+        options={{
+          title: 'Custom animation',
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+        }}
+      />
+      <Stack.Screen
+        name="mapDetail"
+        component={MapDetail}
+        options={{
+          title: '상세정보',
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          tabBarActiveTintColor: '#e91e63',
-        }}>
-        <Tab.Screen
-          name="일정"
-          options={{
-            tabBarLabel: 'Homdde',
-            tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="contain-end"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-          component={Home}
-        />
-        <Tab.Screen
-          name="지도"
-          options={{
-            tabBarLabel: 'Updates',
-            tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="weather-hail"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-          component={Map}
-        />
-        <Tab.Screen
-          name="My"
-          options={{
-            tabBarLabel: 'Profile',
-            tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="bell-outline"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-          component={Setting}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <NavigationContainer>
+        <TotalStack />
+      </NavigationContainer>
+    </ApplicationProvider>
   );
 }
