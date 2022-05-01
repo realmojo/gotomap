@@ -9,38 +9,16 @@ import NaverMapView, {
 import {StyleSheet, View, Text} from 'react-native';
 import {Layout, Input, Divider, List, ListItem} from '@ui-kitten/components';
 import {debounce} from 'lodash';
-import axios from 'axios';
-
-const API_URL = 'https://map.naver.com/v5/api';
-
-const getSearchData = text => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `${API_URL}/instantSearch?lang=ko&caller=pcweb&types=place,address,bus&coords=37.51708600000052,126.899465946063&query=${encodeURI(
-          text,
-        )}`,
-      )
-      .then(res => {
-        resolve(res.data);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
+import {getSearchPlaces} from '../api';
 
 export const Map = ({navigation}) => {
   const [value, setValue] = useState('');
-  const [id, setId] = useState(0);
+  const [id, setId] = useState(11718044);
   const [places, setPlaces] = useState([]);
   const [coordinate, setCoordinate] = useState({
-    latitude: 37.564362,
-    longitude: 126.977011,
+    longitude: 126.97601589994,
+    latitude: 37.5632555012193,
   });
-  // const P0 = {latitude: 37.564362, longitude: 126.977011};
-  // const P1 = {latitude: 37.565051, longitude: 126.978567};
-  // const P2 = {latitude: 37.565383, longitude: 126.976292};
 
   const doClose = () => {
     setValue('');
@@ -58,14 +36,16 @@ export const Map = ({navigation}) => {
   };
 
   const renderItem = ({item}) => {
-    const {title, roadAddress, id, x: longitude, y: latitude} = item.place;
-    return (
-      <ListItem
-        title={title}
-        description={roadAddress}
-        onPress={() => placeClick(id, latitude, longitude)}
-      />
-    );
+    if (item.place !== null) {
+      const {title, roadAddress, id, x: longitude, y: latitude} = item.place;
+      return (
+        <ListItem
+          title={title}
+          description={roadAddress}
+          onPress={() => placeClick(id, latitude, longitude)}
+        />
+      );
+    }
   };
 
   const doSearch = useCallback(
@@ -74,9 +54,9 @@ export const Map = ({navigation}) => {
         setPlaces([]);
         return;
       }
-      const {all: items} = await getSearchData(value);
+      const {all: items} = await getSearchPlaces(value);
       setPlaces(items);
-    }, 500),
+    }, 300),
     [],
   );
 

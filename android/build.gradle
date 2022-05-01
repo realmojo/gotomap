@@ -57,5 +57,6 @@ allprojects {
             url 'https://naver.jfrog.io/artifactory/maven/'
         }
         maven { url 'https://www.jitpack.io' }
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     }
 }

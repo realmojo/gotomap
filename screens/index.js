@@ -4,3 +4,4 @@ export * from './Map';
 export * from './Setting';
 export * from './Detail';
 export * from './MapDetail';
+export * from './Login';

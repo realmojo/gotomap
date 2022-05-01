@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">gotomap</string>
+	<string name="app_name">가봐야지도</string>
+	<!-- <string name="kakao_app_key">fcef10c79a13ca86b4404f1eccff93a9</string> -->
 </resources>

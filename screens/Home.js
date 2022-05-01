@@ -1,13 +1,11 @@
 import React from 'react';
 import {StyleSheet, Image, View} from 'react-native';
-import {Button, ButtonGroup, Input} from '@ui-kitten/components';
-import {Card, List, Text} from '@ui-kitten/components';
+import {Card, List, Text, Button} from '@ui-kitten/components';
 import {item} from '../mock/item';
 import axios from 'axios';
-
-// const data = new Array(8).fill({
-//   title: '그믐족발',
-// });
+import {kakaoLogin} from '../api/KakaoLogin';
+import useStore from '../stores';
+import {observer} from 'mobx-react';
 
 const getTestData = () => {
   return new Promise(resolve => {
@@ -20,11 +18,13 @@ const getTestData = () => {
 };
 
 const data = item;
-export const Home = ({navigation}) => {
-  console.log(navigation);
+export const Home = observer(({navigation}) => {
+  const {login} = useStore();
   const doClick = async () => {
-    const data = await getTestData();
-    console.log(data);
+    console.log(login);
+    login.increase();
+    // const data = await getTestData();
+    // console.log(data);
   };
   const renderItemHeader = (headerProps, name) => (
     <View {...headerProps}>
@@ -37,7 +37,8 @@ export const Home = ({navigation}) => {
   );
 
   const doStack = () => {
-    navigation.navigate('detail');
+    kakaoLogin();
+    // navigation.navigate('detail');
   };
 
   const renderItem = info => {
@@ -78,27 +79,16 @@ export const Home = ({navigation}) => {
           <Text>123</Text>
           <Text>123</Text> */}
         </View>
-        {/* <Button onPress={() => doClick()}>Click</Button> */}
+
+        <Button onPress={() => doClick()}>Click</Button>
+        <Text>{login.number}</Text>
       </Card>
     );
   };
 
   return (
     <View style={{backgroundColor: 'white'}}>
-      {/* <Input
-        style={styles.searchInput}
-        placeholder="Place your Text"
-        value={value}
-        onChangeText={nextValue => setValue(nextValue)}
-        size="large"
-      /> */}
-      {/* <ButtonGroup
-        style={styles.buttonGroup}
-        appearance="outline"
-        status="warning">
-        <Button>L</Button>
-        <Button>R</Button>
-      </ButtonGroup> */}
+      <Text style={{display: 'none'}}>{login.number}</Text>
       <List
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -107,7 +97,7 @@ export const Home = ({navigation}) => {
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
