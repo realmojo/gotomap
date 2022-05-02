@@ -14,7 +14,7 @@ const kakaoLogin = async () => {
 const getProfile = async () => {
   try {
     const response = await KakaoSDK.getProfile();
-    console.log(response);
+    // console.log(response);
     return response;
   } catch (e) {
     console.log(e);

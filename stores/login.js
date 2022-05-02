@@ -1,5 +1,5 @@
-import {observable} from 'mobx';
-import {getProfile, kakaoLogin} from '../api/KakaoLogin';
+import {observable, runInAction} from 'mobx';
+import {getProfile, kakaoLogin, addUser} from '../api';
 
 const login = observable({
   isLogin: false,
@@ -7,18 +7,37 @@ const login = observable({
   getProfile: {},
   async socialKakaoLogin() {
     const res = await kakaoLogin();
-    console.log(res);
     if (res.access_token) {
-      this.isLogin = true;
+      // user 적재
+      const userInfo = await this.getUser();
+      console.log(userInfo);
+      const user = await addUser(userInfo);
+      runInAction(() => {
+        this.isLogin = true;
+      });
+      console.log(user);
     }
-    this.getProfile();
+
+    // token 적재
+    // try {
+    //   await saveToken(res);
+    // } catch (e) {
+    //   console.log(e);
+    // }
+    // try {
+    //   await addUser(userInfo);
+    // } catch (e) {
+    //   console.log(e);
+    // }
   },
-  async getProfile() {
-    if (this.isLogin) {
-      const res = await getProfile();
-      this.userInfo = res;
-      console.log(this.userInfo);
-    }
+  async getUser() {
+    // if (this.isLogin) {
+    const res = await getProfile();
+    this.userInfo = res;
+    console.log(this.userInfo);
+
+    return res;
+    // }
   },
   number: 1,
   setIslogin(value) {
