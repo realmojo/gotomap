@@ -7,6 +7,7 @@ const login = observable({
   getProfile: {},
   async socialKakaoLogin() {
     const res = await kakaoLogin();
+    console.log(res);
     if (res.access_token) {
       this.isLogin = true;
     }
@@ -16,6 +17,7 @@ const login = observable({
     if (this.isLogin) {
       const res = await getProfile();
       this.userInfo = res;
+      console.log(this.userInfo);
     }
   },
   number: 1,

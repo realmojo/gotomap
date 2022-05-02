@@ -32,10 +32,6 @@ export const Home = observer(({navigation}) => {
     </View>
   );
 
-  const renderItemFooter = footerProps => (
-    <Text {...footerProps}>By Wikipedia</Text>
-  );
-
   const doStack = () => {
     kakaoLogin();
     // navigation.navigate('detail');
