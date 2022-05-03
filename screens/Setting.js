@@ -12,15 +12,15 @@ const removeId = async () => {
 export const Setting = observer(() => {
   const {login} = useStore();
   const {name, profileImage} = login.userInfo;
-  const [id, setId] = useState('');
+  // const [id, setId] = useState('');
   const doLogout = async () => {
     await removeId();
     login.setIslogin(false);
   };
-  const getId = async () => {
-    const id = await AsyncStorage.getItem('id');
-    setId(id);
-  };
+  // const getId = async () => {
+  //   const id = await AsyncStorage.getItem('id');
+  //   setId(id);
+  // };
   return (
     <Layout style={{flex: 1}}>
       <ListItem
@@ -37,8 +37,8 @@ export const Setting = observer(() => {
       />
       <Text>{login.number}</Text>
       <Button onPress={() => doLogout()}>Logout</Button>
-      <Button onPress={() => getId()}>ID 가져오기</Button>
-      <Text>{id}</Text>
+      {/* <Button onPress={() => getId()}>ID 가져오기</Button> */}
+      {/* <Text>{id}</Text> */}
     </Layout>
   );
 });

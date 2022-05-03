@@ -7,7 +7,7 @@ import {
   ScrollView,
   Linking,
 } from 'react-native';
-import Carousel from '../components/Carousel';
+import {Carousel} from '../components';
 
 import {Text, Button} from '@ui-kitten/components';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
@@ -72,7 +72,9 @@ export const MapDetail = ({route: {params}}) => {
       name: title,
       y: latitude,
       x: longitude,
+      imageURL,
       phone,
+      category,
       fullAddress,
       addressAbbr,
       fullRoadAddress,
@@ -89,8 +91,9 @@ export const MapDetail = ({route: {params}}) => {
       description,
       fullAddress,
       fullRoadAddress,
+      imageURL,
+      category,
       phone,
-      //   info: object;
       status: PLACE_STATUS.BACKLOG,
       sido,
       sigungu,
@@ -102,7 +105,9 @@ export const MapDetail = ({route: {params}}) => {
       if (res) {
         setIsGo(!isGo);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const bizInfoText = (item, number) => {
@@ -186,7 +191,6 @@ export const MapDetail = ({route: {params}}) => {
                 color={iconColor}
                 size={iconSize}
               />
-
               {item.phone ? (
                 <Text
                   style={styles.phoneText}
@@ -279,7 +283,7 @@ export const MapDetail = ({route: {params}}) => {
           size="large"
           onPress={() => doGo()}>
           <Text style={styles.goText}>가봐야지 </Text>
-          <MaterialCommunityIcons name={isGo ? 'check' : ''} size={16} />
+          {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
         </Button>
       </View>
     </View>

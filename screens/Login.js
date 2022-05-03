@@ -2,24 +2,14 @@ import React, {useState, useLayoutEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Layout, Spinner} from '@ui-kitten/components';
 import useStore from '../stores';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useQuery} from 'react-query';
+import {getId} from '../api';
 
 const LoadingIndicator = () => (
   <View style={styles.indicator}>
     <Spinner size="small" status="control" />
   </View>
 );
-
-const getId = () => {
-  return new Promise(resolve => {
-    setTimeout(async () => {
-      const id = await AsyncStorage.getItem('id');
-      console.log(id);
-      resolve(id);
-    }, 100);
-  });
-};
 
 export const Login = () => {
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
@@ -32,6 +22,7 @@ export const Login = () => {
     onSuccess: data => {
       // 성공시 호출
       if (data) {
+        console.log(data);
         login.setIslogin(true);
         login.socialKakaoLogin();
       }
