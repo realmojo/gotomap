@@ -7,32 +7,102 @@ import {
   ScrollView,
   Linking,
 } from 'react-native';
-import Carousel from 'react-native-snap-carousel';
-import {Text, Divider, Icon, Button} from '@ui-kitten/components';
+import Carousel from '../components/Carousel';
+
+import {Text, Button} from '@ui-kitten/components';
+import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const {width: viewportWidth} = Dimensions.get('window');
+import {getMapDetailInfo, addPlace} from '../api';
+import moment from 'moment';
+import useStore from '../stores';
+import {PLACE_STATUS} from '../config/constants';
+import {getSidoAndSigungu} from '../utils';
 
-import {getMapDetailInfo} from '../api';
-
-const wp = percentage => {
-  const value = (percentage * viewportWidth) / 100;
-  return Math.round(value);
-};
-const slideWidth = wp(75);
-const itemHorizontalMargin = wp(2);
-const sliderWidth = viewportWidth;
-const itemWidth = slideWidth + itemHorizontalMargin * 2;
 const iconColor = '#dadbdd';
 const iconSize = 18;
 
+const toastConfig = {
+  /*
+    Overwrite 'success' type,
+    by modifying the existing `BaseToast` component
+  */
+  success: props => (
+    <BaseToast
+      {...props}
+      style={{borderLeftColor: 'orange'}}
+      contentContainerStyle={{paddingHorizontal: 15}}
+      text1Style={{
+        fontSize: 24,
+        fontWeight: '800',
+      }}
+    />
+  ),
+  error: props => (
+    <ErrorToast
+      {...props}
+      text1Style={{
+        fontSize: 17,
+      }}
+      text2Style={{
+        fontSize: 15,
+      }}
+    />
+  ),
+  tomatoToast: ({text1, props}) => (
+    <View style={{height: 60, width: '100%', backgroundColor: 'tomato'}}>
+      <Text>{text1}</Text>
+      <Text>{props.uuid}</Text>
+    </View>
+  ),
+};
+
 export const MapDetail = ({route: {params}}) => {
+  const {login} = useStore();
   const {id} = params;
   const [item, setItem] = useState({});
+  const [page, setPage] = useState(0);
   const [isGo, setIsGo] = useState(false);
 
-  const doGo = () => {
-    setIsGo(!isGo);
+  const doGo = async () => {
+    showToast();
+    const {
+      id: placeId,
+      name: title,
+      y: latitude,
+      x: longitude,
+      phone,
+      fullAddress,
+      addressAbbr,
+      fullRoadAddress,
+      description,
+    } = item;
+    const {id: userId} = login.userInfo;
+    const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
+    const params = {
+      placeId,
+      userId,
+      latitude, // 위도
+      longitude, // 경도
+      title,
+      description,
+      fullAddress,
+      fullRoadAddress,
+      phone,
+      //   info: object;
+      status: PLACE_STATUS.BACKLOG,
+      sido,
+      sigungu,
+      regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
+    };
+
+    try {
+      const res = await addPlace(params);
+      if (res) {
+        setIsGo(!isGo);
+      }
+    } catch (e) {}
   };
 
   const bizInfoText = (item, number) => {
@@ -60,20 +130,6 @@ export const MapDetail = ({route: {params}}) => {
     return value !== undefined && value !== null;
   };
 
-  const _renderItem = ({item}) => {
-    const {url} = item;
-    return (
-      <View>
-        <Image
-          style={styles.image}
-          source={{
-            uri: url,
-          }}
-        />
-      </View>
-    );
-  };
-
   useEffect(() => {
     async function fetchData() {
       const data = await getMapDetailInfo(id);
@@ -81,18 +137,39 @@ export const MapDetail = ({route: {params}}) => {
     }
     fetchData();
   }, []);
+
+  const _renderItem = ({item}) => (
+    <View style={styles.imageWrap}>
+      <Image
+        style={styles.image}
+        source={{
+          uri: item.url,
+        }}
+      />
+    </View>
+  );
+  // Toast 메세지 출력
+  const showToast = () => {
+    Toast.show({
+      text1: '등록완료',
+      text2: '언젠간 꼭 가보기로 해요! 일정에서 확인해보세요 👏',
+      position: 'bottom',
+      bottomOffset: 60,
+    });
+  };
+
   return (
     <View style={{flex: 1}}>
       <ScrollView>
         <View style={styles.container}>
           {item.imageURL && (
             <Carousel
-              layout={'stack'}
-              layoutCardOffset={'18'}
+              page={page}
+              setPage={setPage}
+              gap={0}
               data={item.images}
-              renderItem={_renderItem}
-              sliderWidth={sliderWidth}
-              itemWidth={itemWidth}
+              pageWidth={Dimensions.get('screen').width}
+              RenderItem={_renderItem}
             />
           )}
           {item.categories !== undefined && item.categories.length === 2 && (
@@ -111,7 +188,9 @@ export const MapDetail = ({route: {params}}) => {
               />
 
               {item.phone ? (
-                <Text onPress={() => Linking.openURL(`tel:${item.phone}`)}>
+                <Text
+                  style={styles.phoneText}
+                  onPress={() => Linking.openURL(`tel:${item.phone}`)}>
                   {item.phone}
                 </Text>
               ) : (
@@ -192,6 +271,7 @@ export const MapDetail = ({route: {params}}) => {
           )}
         </View>
       </ScrollView>
+      <Toast config={toastConfig} />
       <View>
         <Button
           style={styles.button}
@@ -199,10 +279,7 @@ export const MapDetail = ({route: {params}}) => {
           size="large"
           onPress={() => doGo()}>
           <Text style={styles.goText}>가봐야지 </Text>
-          <MaterialCommunityIcons
-            name={isGo ? 'check-circle' : 'check'}
-            size={16}
-          />
+          <MaterialCommunityIcons name={isGo ? 'check' : ''} size={16} />
         </Button>
       </View>
     </View>
@@ -214,16 +291,16 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
   },
-  divider: {
-    backgroundColor: '#dadbdd',
+  imageWrap: {
+    width: Dimensions.get('screen').width,
+    height: 250,
   },
   image: {
     width: '100%',
     minHeight: 250,
-    margin: 10,
-    borderRadius: 10,
   },
   category: {
+    marginTop: 10,
     color: '#8f8f8f',
   },
   title: {
@@ -245,5 +322,9 @@ const styles = StyleSheet.create({
   },
   goText: {
     color: 'white',
+  },
+  phoneText: {
+    color: '#FFAA00',
+    textDecorationLine: 'underline',
   },
 });

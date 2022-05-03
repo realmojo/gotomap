@@ -11,14 +11,13 @@ const kakaoLogin = async () => {
   }
 };
 
-const getProfile = async () => {
+const getKakaoProfile = async () => {
   try {
     const response = await KakaoSDK.getProfile();
-    // console.log(response);
     return response;
   } catch (e) {
     console.log(e);
   }
 };
 
-export {kakaoLogin, getProfile};
+export {kakaoLogin, getKakaoProfile};

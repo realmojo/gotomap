@@ -1,24 +1,29 @@
 import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import * as eva from '@eva-design/eva';
-import {ApplicationProvider, Button, Layout} from '@ui-kitten/components';
+import {
+  ApplicationProvider,
+  IconRegistry,
+  Button,
+  Layout,
+} from '@ui-kitten/components';
+import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import {BottomTab, Detail, MapDetail, Login} from './screens';
-import {View, Text} from 'react-native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
 import useStore from './stores';
 import {observer} from 'mobx-react';
+import {QueryClient, QueryClientProvider} from 'react-query';
+const queryClient = new QueryClient();
 
 const Stack = createStackNavigator();
 
 const TotalStack = observer(() => {
   const {login} = useStore();
   const doClick = () => {
-    console.log(login.isLogin);
     login.setIslogin(true);
-    console.log(login.isLogin);
   };
   return (
     <>
@@ -63,10 +68,15 @@ const TotalStack = observer(() => {
 
 export default function App() {
   return (
-    <ApplicationProvider {...eva} theme={eva.light}>
-      <NavigationContainer>
-        <TotalStack />
-      </NavigationContainer>
-    </ApplicationProvider>
+    <>
+      <IconRegistry icons={EvaIconsPack} />
+      <QueryClientProvider client={queryClient}>
+        <ApplicationProvider {...eva} theme={eva.light}>
+          <NavigationContainer>
+            <TotalStack />
+          </NavigationContainer>
+        </ApplicationProvider>
+      </QueryClientProvider>
+    </>
   );
 }

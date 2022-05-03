@@ -13,16 +13,19 @@
   "dependencies": {
     "@actbase/react-kakaosdk": "^0.9.19",
     "@eva-design/eva": "^2.1.1",
+    "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/material-bottom-tabs": "^6.2.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.2",
     "@react-navigation/stack": "^6.2.1",
     "@ui-kitten/components": "^5.1.2",
+    "@ui-kitten/eva-icons": "^5.1.2",
     "axios": "^0.27.2",
     "lodash": "^4.17.21",
     "mobx": "^6.5.0",
     "mobx-react": "^7.3.0",
+    "moment": "^2.29.3",
     "react": "17.0.2",
     "react-native": "0.68.1",
     "react-native-config-reader": "^4.1.1",
@@ -33,7 +36,9 @@
     "react-native-screens": "^3.13.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^12.3.0",
-    "react-native-vector-icons": "^9.1.0"
+    "react-native-toast-message": "^2.1.5",
+    "react-native-vector-icons": "^9.1.0",
+    "react-query": "^3.38.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

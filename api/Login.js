@@ -1,17 +1,28 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import moment from 'moment';
+import {API_URL} from './index';
 
-const API_URL = 'https://soft-bags-tie-116-38-134-229.loca.lt';
+const setStorageId = async id => {
+  try {
+    await AsyncStorage.setItem('id', id);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 const addUser = params => {
   const param = {
     id: params.id,
     name: params.properties.nickname,
     profileImage: params.properties.profile_image,
+    regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
   };
   return new Promise((resolve, reject) => {
     axios
       .post(`${API_URL}/user`, param)
       .then(res => {
+        setStorageId(res.data.id);
         resolve(res.data);
       })
       .catch(e => {

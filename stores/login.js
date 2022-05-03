@@ -1,5 +1,5 @@
 import {observable, runInAction} from 'mobx';
-import {getProfile, kakaoLogin, addUser} from '../api';
+import {getKakaoProfile, kakaoLogin, addUser} from '../api';
 
 const login = observable({
   isLogin: false,
@@ -8,46 +8,33 @@ const login = observable({
   async socialKakaoLogin() {
     const res = await kakaoLogin();
     if (res.access_token) {
-      // user 적재
+      // user가 없을 경우 백엔드에서 등록한다.
       const userInfo = await this.getUser();
-      console.log(userInfo);
-      const user = await addUser(userInfo);
-      runInAction(() => {
-        this.isLogin = true;
-      });
-      console.log(user);
+      try {
+        const user = await addUser(userInfo);
+        runInAction(() => {
+          console.log('login success');
+          this.isLogin = true;
+          this.userInfo = user;
+        });
+      } catch (e) {
+        console.log(e);
+        runInAction(() => {
+          this.isLogin = false;
+        });
+      }
     }
-
-    // token 적재
-    // try {
-    //   await saveToken(res);
-    // } catch (e) {
-    //   console.log(e);
-    // }
-    // try {
-    //   await addUser(userInfo);
-    // } catch (e) {
-    //   console.log(e);
-    // }
   },
   async getUser() {
-    // if (this.isLogin) {
-    const res = await getProfile();
-    this.userInfo = res;
-    console.log(this.userInfo);
-
+    // 카카오의 프로필읠 가져온다.
+    const res = await getKakaoProfile();
     return res;
-    // }
   },
   number: 1,
   setIslogin(value) {
-    this.isLogin = value;
-  },
-  increase() {
-    this.number++;
-  },
-  decrease() {
-    this.number--;
+    runInAction(() => {
+      this.isLogin = value;
+    });
   },
 });
 

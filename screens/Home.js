@@ -1,28 +1,59 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
-import {Card, List, Text, Button} from '@ui-kitten/components';
+import {
+  Card,
+  Layout,
+  List,
+  Icon,
+  Text,
+  Spinner,
+  ButtonGroup,
+  Button,
+  Avatar,
+  MenuItem,
+  OverflowMenu,
+  TopNavigation,
+  TopNavigationAction,
+} from '@ui-kitten/components';
 import {item} from '../mock/item';
 import axios from 'axios';
 import {kakaoLogin} from '../api/KakaoLogin';
 import useStore from '../stores';
 import {observer} from 'mobx-react';
+import {PlaceList, PlaceMap} from '../components';
 
-const getTestData = () => {
-  return new Promise(resolve => {
-    axios
-      .get('https://map.naver.com/v5/api/sites/summary/1496912473?lang=ko')
-      .then(res => {
-        resolve(res.data);
-      });
-  });
-};
+const MenuIcon = props => <Icon {...props} name="more-vertical" />;
+
+const InfoIcon = props => <Icon {...props} name="info" />;
+
+const LogoutIcon = props => <Icon {...props} name="log-out" />;
+
+// const getTestData = () => {
+//   return new Promise(resolve => {
+//     axios
+//       .get('https://map.naver.com/v5/api/sites/summary/1496912473?lang=ko')
+//       .then(res => {
+//         resolve(res.data);
+//       });
+//   });
+// };
+
+const listIcon = props => (
+  <Icon {...props} fill="#8F9BB3" name="list-outline" />
+);
+
+const mapIcon = props => <Icon {...props} fill="#8F9BB3" name="map-outline" />;
+
+const StarIcon = () => <Icon style={styles.icon} fill="#8F9BB3" name="star" />;
 
 const data = item;
 export const Home = observer(({navigation}) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [viewType, setViewType] = useState('list');
   const {login} = useStore();
   const doClick = async () => {
-    console.log(login);
-    login.increase();
+    // console.log(login);
+    // login.increase();
     // const data = await getTestData();
     // console.log(data);
   };
@@ -71,9 +102,6 @@ export const Home = observer(({navigation}) => {
               {fullAddress}
             </Text>
           </View>
-          {/* <Text>123</Text>
-          <Text>123</Text>
-          <Text>123</Text> */}
         </View>
 
         <Button onPress={() => doClick()}>Click</Button>
@@ -82,16 +110,82 @@ export const Home = observer(({navigation}) => {
     );
   };
 
-  return (
-    <View style={{backgroundColor: 'white'}}>
-      <Text style={{display: 'none'}}>{login.number}</Text>
-      <List
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        data={data}
-        renderItem={renderItem}
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  const renderMenuAction = () => (
+    <TopNavigationAction icon={MenuIcon} onPress={toggleMenu} />
+  );
+
+  const doViewType = value => {
+    setViewType(value);
+    toggleMenu();
+  };
+
+  const renderOverflowMenuAction = () => (
+    <React.Fragment>
+      <OverflowMenu
+        anchor={renderMenuAction}
+        visible={menuVisible}
+        onBackdropPress={toggleMenu}>
+        <MenuItem
+          accessoryLeft={mapIcon}
+          onPress={() => doViewType('map')}
+          title="지도로 보기"
+        />
+        <MenuItem
+          accessoryLeft={listIcon}
+          onPress={() => doViewType('list')}
+          title="목록으로 보기"
+        />
+      </OverflowMenu>
+    </React.Fragment>
+  );
+
+  const renderTitle = props => (
+    <View style={styles.titleContainer}>
+      <Avatar
+        style={styles.logo}
+        source={require('../assets/images/logo.png')}
       />
+      <Text {...props}>가봐야지도</Text>
     </View>
+  );
+
+  return (
+    <View>
+      <TopNavigation
+        title={renderTitle}
+        accessoryRight={renderOverflowMenuAction}
+      />
+      {viewType === 'list' ? <PlaceList /> : <PlaceMap />}
+
+      {/* <View>
+        <ButtonGroup style={styles.buttonGroup} status="warning">
+          <Button>지도로 보기</Button>
+          <Button>지역으로 보기</Button>
+        </ButtonGroup>
+        <Button
+          status="warning"
+          size="small"
+          appearance="outline"
+          accessoryLeft={mapIcon}
+        />
+      </View>
+      <View>
+        <Text>123</Text>
+      </View> */}
+    </View>
+    // <View style={{backgroundColor: 'white'}}>
+    //   <Text style={{display: 'none'}}>{login.number}</Text>
+    //   <List
+    //     style={styles.container}
+    //     contentContainerStyle={styles.contentContainer}
+    //     data={data}
+    //     renderItem={renderItem}
+    //   />
+    // </View>
   );
 });
 
@@ -116,5 +210,16 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     margin: 4,
+  },
+  icon: {
+    width: 32,
+    height: 32,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    marginHorizontal: 16,
   },
 });
