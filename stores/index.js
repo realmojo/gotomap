@@ -1,7 +1,8 @@
-import {login} from './login';
+import {loginStore} from './login';
+import {userStore} from './user';
 
 const useStore = () => {
-  return {login};
+  return {loginStore, userStore};
 };
 
 export default useStore;

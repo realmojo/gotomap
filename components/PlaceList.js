@@ -1,31 +1,29 @@
 import React, {useState, useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, RefreshControl} from 'react-native';
 import {
   List,
-  ListItem,
-  Avatar,
-  Card,
-  Button,
-  Text,
   IndexPath,
-  Icon,
   Layout,
+  Text,
   Select,
   SelectItem,
 } from '@ui-kitten/components';
 import {getPlaces} from '../api';
-import {SIDO, SIGUNGU} from '../config/constants';
-import {useQuery, useQueryClient, useMutation} from 'react-query';
-import {PLACE_STATUS} from '../config/constants';
-import {TextDetail} from './index';
+import {PLACE_STATUS, SIDO, SIGUNGU} from '../config/constants';
+import {useQuery, useQueryClient} from 'react-query';
+import {PlaceListItem} from './index';
+import {LoadingIndicator} from '../utils';
+import {Nothing} from './Nothing';
 
 const defaultSigungu = {
   name_en: 'All',
   name_kr: '전체(시/군/구)',
 };
-const mapIcon = props => <Icon {...props} name="map" />;
+// const mapIcon = props => <Icon {...props} name="map" />;
 
-const PlaceList = () => {
+const PlaceList = ({statusType, navigation}) => {
+  const [refreshing, setRefreshing] = useState(false);
+
   const queryClient = useQueryClient();
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
   const [selectedSigungu, setSelectedSigungu] = useState(defaultSigungu);
@@ -37,6 +35,7 @@ const PlaceList = () => {
 
   const [allData, setAllData] = useState([]);
   const [isFirst, setIsFirst] = useState(true);
+
   const {isLoading, data} = useQuery('getPlaces', getPlaces, {
     onSuccess: items => {
       if (isFirst) {
@@ -44,10 +43,36 @@ const PlaceList = () => {
         setAllData(items);
         setIsFirst(false);
       }
+      console.log('getPlaces reload');
+    },
+    select: items => {
+      console.log('select filter item');
+      const filterItems = items.filter(item => {
+        if (statusType === PLACE_STATUS.ALL) {
+          return true;
+        } else if (statusType === PLACE_STATUS.DONE) {
+          return item.status === PLACE_STATUS.DONE;
+        } else if (statusType === PLACE_STATUS.BACKLOG)
+          return item.status === PLACE_STATUS.BACKLOG;
+      });
+      return filterItems;
+    },
+    onError: () => {
+      console.log('getPlaces failed');
     },
   });
 
-  const filterData = ({name_en, name_kr}, type) => {
+  const wait = timeout => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    queryClient.refetchQueries('getPlaces');
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
+  const filterData = useCallback(({name_en, name_kr}, type) => {
     if (type === 'sido') {
       queryClient.setQueryData('getPlaces', () => {
         if (name_en !== 'All') {
@@ -56,7 +81,6 @@ const PlaceList = () => {
         return allData;
       });
     } else if (type === 'sigungu') {
-      console.log(selectedSido);
       queryClient.setQueriesData('getPlaces', () => {
         if (name_en !== 'All') {
           return allData.filter(
@@ -68,53 +92,9 @@ const PlaceList = () => {
         }
       });
     }
-  };
+  });
 
-  const renderItemHeader = (headerProps, item) => {
-    const {title, category, imageURL, status} = item;
-    return (
-      <ListItem
-        style={{padding: 10}}
-        title={title}
-        description={category}
-        accessoryLeft={() => (
-          <Avatar
-            source={
-              imageURL ? {uri: imageURL} : require('../assets/images/logo.png')
-            }
-          />
-        )}
-        accessoryRight={() => (
-          <Button
-            style={{margin: 10}}
-            size="small"
-            appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
-            status="warning">
-            <Text style={{fontSize: 19}}>
-              {status === PLACE_STATUS.BACKLOG ? '가봐야지' : '가봤지'}
-            </Text>
-          </Button>
-        )}
-      />
-    );
-  };
-  const doStack = () => {};
-  const renderItem = item => {
-    const {fullAddress} = item.item;
-    return (
-      <View>
-        <Card
-          style={styles.item}
-          status="basic"
-          header={headerProps => renderItemHeader(headerProps, item.item)}
-          onPress={() => doStack()}>
-          <TextDetail iconName="map-marker" text={fullAddress} />
-        </Card>
-      </View>
-    );
-  };
-
-  const doSidoSelect = index => {
+  const doSidoSelect = useCallback(index => {
     setSelectedSidoIndex(index);
     setSelectedSido(SIDO[index.row]);
     if (SIDO[index.row].name_en === 'All') {
@@ -126,7 +106,7 @@ const PlaceList = () => {
     setSelectedSigungu(defaultSigungu);
 
     filterData(SIDO[index.row], 'sido');
-  };
+  });
 
   const doSigunguSelect = index => {
     setSelectedSigunguIndex(index);
@@ -136,12 +116,9 @@ const PlaceList = () => {
   };
 
   if (isLoading) {
-    return (
-      <View>
-        <Text style={styles.text}>Data Loading...</Text>
-      </View>
-    );
+    return <LoadingIndicator />;
   }
+
   return (
     <View style={{marginBottom: 210}}>
       <Layout style={styles.layoutContainer} level="2">
@@ -164,15 +141,22 @@ const PlaceList = () => {
               <SelectItem key={index} title={item.name_kr} />
             ))}
         </Select>
-        {/* <Button size="small" status="control" accessoryLeft={mapIcon} /> */}
-        {/* <Text>{selectedIndex}</Text> */}
       </Layout>
-      <List
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        data={data}
-        renderItem={renderItem}
-      />
+      {data !== null && data.length > 0 ? (
+        <List
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          data={data}
+          renderItem={item => (
+            <PlaceListItem item={item} navigation={navigation} />
+          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      ) : (
+        <Nothing navigation={navigation} />
+      )}
     </View>
   );
 };

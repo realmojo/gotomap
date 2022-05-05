@@ -37,10 +37,6 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     color: 'black',
   },
-  phoneText: {
-    color: '#FFAA00',
-    textDecorationLine: 'underline',
-  },
 });
 
 export {TextDetail};

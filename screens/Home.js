@@ -9,26 +9,15 @@ import {
   TopNavigation,
   TopNavigationAction,
 } from '@ui-kitten/components';
-import {item} from '../mock/item';
-import {kakaoLogin} from '../api/KakaoLogin';
 import {observer} from 'mobx-react';
 import {PlaceList, PlaceMap} from '../components';
+import {PLACE_STATUS} from '../config/constants';
 
 const MenuIcon = props => <Icon {...props} name="more-vertical" />;
 
-const InfoIcon = props => <Icon {...props} name="info" />;
-
-const LogoutIcon = props => <Icon {...props} name="log-out" />;
-
-// const getTestData = () => {
-//   return new Promise(resolve => {
-//     axios
-//       .get('https://map.naver.com/v5/api/sites/summary/1496912473?lang=ko')
-//       .then(res => {
-//         resolve(res.data);
-//       });
-//   });
-// };
+const StarIcon = (color, name) => {
+  return <Icon style={styles.icon} fill={color} name={name} />;
+};
 
 const listIcon = props => (
   <Icon {...props} fill="#8F9BB3" name="list-outline" />
@@ -36,10 +25,10 @@ const listIcon = props => (
 
 const mapIcon = props => <Icon {...props} fill="#8F9BB3" name="map-outline" />;
 
-const StarIcon = () => <Icon style={styles.icon} fill="#8F9BB3" name="star" />;
-
-const data = item;
 export const Home = observer(({navigation}) => {
+  const [statusValue, setStatusValue] = useState('all');
+  const [starIconColor, setStarIconColor] = useState('#d2d2d2');
+  const [starIconName, setStarIconName] = useState('star');
   const [menuVisible, setMenuVisible] = useState(false);
   const [viewType, setViewType] = useState('list');
   const toggleMenu = () => {
@@ -55,8 +44,32 @@ export const Home = observer(({navigation}) => {
     toggleMenu();
   };
 
+  const filterData = () => {
+    switch (statusValue) {
+      case PLACE_STATUS.ALL:
+        setStatusValue(PLACE_STATUS.DONE);
+        setStarIconColor('#ffaa00');
+        setStarIconName('star');
+        break;
+      case PLACE_STATUS.DONE:
+        setStatusValue(PLACE_STATUS.BACKLOG);
+        setStarIconColor('#ffaa00');
+        setStarIconName('star-outline');
+        break;
+      case PLACE_STATUS.BACKLOG:
+        setStatusValue(PLACE_STATUS.ALL);
+        setStarIconColor('#d2d2d2');
+        setStarIconName('star');
+        break;
+    }
+  };
+
   const renderOverflowMenuAction = () => (
     <React.Fragment>
+      <TopNavigationAction
+        onPress={() => filterData()}
+        icon={() => StarIcon(starIconColor, starIconName)}
+      />
       <OverflowMenu
         anchor={renderMenuAction}
         visible={menuVisible}
@@ -91,17 +104,12 @@ export const Home = observer(({navigation}) => {
         title={renderTitle}
         accessoryRight={renderOverflowMenuAction}
       />
-      {viewType === 'list' ? <PlaceList /> : <PlaceMap />}
+      {viewType === 'list' ? (
+        <PlaceList statusType={statusValue} navigation={navigation} />
+      ) : (
+        <PlaceMap />
+      )}
     </View>
-    // <View style={{backgroundColor: 'white'}}>
-    //   <Text style={{display: 'none'}}>{login.number}</Text>
-    //   <List
-    //     style={styles.container}
-    //     contentContainerStyle={styles.contentContainer}
-    //     data={data}
-    //     renderItem={renderItem}
-    //   />
-    // </View>
   );
 });
 
@@ -117,8 +125,9 @@ const styles = StyleSheet.create({
     margin: 4,
   },
   icon: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
+    tintColor: '#222B45',
   },
   titleContainer: {
     flexDirection: 'row',

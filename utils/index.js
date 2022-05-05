@@ -1,3 +1,7 @@
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
+import {Spinner} from '@ui-kitten/components';
+
 const getSidoAndSigungu = (fullAddress, addressAbbr) => {
   const address = fullAddress.replace(addressAbbr, '');
   const splitAddress = address.split(' ');
@@ -13,4 +17,16 @@ const getSidoAndSigungu = (fullAddress, addressAbbr) => {
   };
 };
 
-export {getSidoAndSigungu};
+const LoadingIndicator = () => (
+  <View style={styles.indicator}>
+    <Spinner size="small" status="control" />
+  </View>
+);
+
+const styles = StyleSheet.create({
+  indicator: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+export {LoadingIndicator, getSidoAndSigungu};

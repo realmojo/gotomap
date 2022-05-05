@@ -59,7 +59,7 @@ const toastConfig = {
 };
 
 export const MapDetail = ({route: {params}}) => {
-  const {login} = useStore();
+  const {loginStore} = useStore();
   const {id} = params;
   const [item, setItem] = useState({});
   const [page, setPage] = useState(0);
@@ -80,7 +80,7 @@ export const MapDetail = ({route: {params}}) => {
       fullRoadAddress,
       description,
     } = item;
-    const {id: userId} = login.userInfo;
+    const {id: userId} = loginStore.userInfo;
     const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
     const params = {
       placeId,

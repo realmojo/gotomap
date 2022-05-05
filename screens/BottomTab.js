@@ -3,7 +3,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 const Tab = createMaterialBottomTabNavigator();
-import {Home, Map, Setting} from './index';
+import {Home, Map, My} from './index';
 
 export const BottomTab = () => {
   return (
@@ -37,8 +37,8 @@ export const BottomTab = () => {
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={Setting}
+        name="My"
+        component={My}
         options={{
           tabBarLabel: 'My',
           tabBarIcon: ({color}) => (

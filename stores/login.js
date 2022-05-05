@@ -1,7 +1,7 @@
 import {observable, runInAction} from 'mobx';
 import {getKakaoProfile, kakaoLogin, addUser} from '../api';
 
-const login = observable({
+const loginStore = observable({
   isLogin: false,
   userInfo: {},
   getProfile: {},
@@ -18,10 +18,11 @@ const login = observable({
           this.userInfo = user;
         });
       } catch (e) {
+        console.log('user info error');
         console.log(e);
-        runInAction(() => {
-          this.isLogin = false;
-        });
+        // runInAction(() => {
+        //   this.isLogin = false;
+        // });
       }
     }
   },
@@ -38,4 +39,4 @@ const login = observable({
   },
 });
 
-export {login};
+export {loginStore};

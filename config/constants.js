@@ -1,4 +1,5 @@
 export const PLACE_STATUS = {
+  ALL: 'all',
   BACKLOG: 'backlog',
   DONE: 'done',
 };

@@ -21,13 +21,13 @@ const queryClient = new QueryClient();
 const Stack = createStackNavigator();
 
 const TotalStack = observer(() => {
-  const {login} = useStore();
+  const {loginStore} = useStore();
   const doClick = () => {
-    login.setIslogin(true);
+    loginStore.setIslogin(true);
   };
   return (
     <>
-      {!login.isLogin ? (
+      {!loginStore.isLogin ? (
         <Login />
       ) : (
         // <View>

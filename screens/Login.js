@@ -1,30 +1,26 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Button, Layout, Spinner} from '@ui-kitten/components';
+import React, {useState} from 'react';
+import {StyleSheet, Image} from 'react-native';
+import {Button, Layout, Spinner, Text} from '@ui-kitten/components';
 import useStore from '../stores';
 import {useQuery} from 'react-query';
 import {getId} from '../api';
-
-const LoadingIndicator = () => (
-  <View style={styles.indicator}>
-    <Spinner size="small" status="control" />
-  </View>
-);
+import {LoadingIndicator} from '../utils';
 
 export const Login = () => {
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
-  const {login} = useStore();
+  const {loginStore, userStore} = useStore();
   const doLogin = () => {
     setIsKakaoLoading(true);
-    login.socialKakaoLogin();
+    loginStore.socialKakaoLogin();
   };
   const {isLoading} = useQuery('login', getId, {
     onSuccess: data => {
       // 성공시 호출
+      console.log('logon data: ', data);
       if (data) {
-        console.log(data);
-        login.setIslogin(true);
-        login.socialKakaoLogin();
+        loginStore.setIslogin(true);
+        loginStore.socialKakaoLogin();
+        userStore.setId(data);
       }
     },
   });
@@ -37,19 +33,38 @@ export const Login = () => {
   }
   return (
     <Layout style={{flex: 1, justifyContent: 'center'}}>
+      <Image
+        style={styles.image}
+        source={require('../assets/images/logo.png')}
+      />
       <Button
+        style={styles.button}
         onPress={() => doLogin()}
+        appearance="ghost"
+        status="basic"
         accessoryRight={isKakaoLoading ? LoadingIndicator : ''}>
-        Login
+        <Text style={styles.buttonText} category="h3">
+          카카오로 로그인
+        </Text>
       </Button>
     </Layout>
   );
 };
 
 const styles = StyleSheet.create({
-  indicator: {
-    backgroundColor: '#3366FF',
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  button: {
+    margin: 40,
+    backgroundColor: '#fae100',
+    borderColor: '#fae100',
+  },
+  buttonText: {
+    color: 'black',
   },
 });
