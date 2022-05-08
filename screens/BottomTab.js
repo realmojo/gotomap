@@ -1,22 +1,22 @@
-import * as React from 'react';
+import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {Place, Map, My} from './index';
 
 const Tab = createMaterialBottomTabNavigator();
-import {Home, Map, My} from './index';
 
 export const BottomTab = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Place"
       activeColor="#ff6721"
       inactiveColor="#7b7b7b"
       barStyle={{backgroundColor: '#fff'}}>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="Place"
+        component={Place}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: 'Place',
           tabBarIcon: ({color}) => (
             <MaterialCommunityIcons name="home" color={color} size={20} />
           ),

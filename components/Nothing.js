@@ -1,6 +1,5 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-
 import {Button, Text} from '@ui-kitten/components';
 
 const Nothing = ({navigation}) => {

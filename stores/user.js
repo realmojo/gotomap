@@ -15,7 +15,6 @@ const userStore = observable({
     });
   },
   setId(userId) {
-    console.log('utils: ', userId);
     runInAction(() => {
       this.userId = userId;
     });

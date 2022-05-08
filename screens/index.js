@@ -1,5 +1,5 @@
 export * from './BottomTab';
-export * from './Home';
+export * from './Place';
 export * from './Map';
 export * from './My';
 export * from './Detail';

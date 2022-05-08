@@ -16,8 +16,8 @@ export const Map = ({navigation}) => {
   const [id, setId] = useState(11718044);
   const [places, setPlaces] = useState([]);
   const [coordinate, setCoordinate] = useState({
-    longitude: 126.97601589994,
     latitude: 37.5632555012193,
+    longitude: 126.97601589994,
   });
 
   const doClose = () => {
@@ -26,7 +26,6 @@ export const Map = ({navigation}) => {
   };
 
   const placeClick = (id, latitude, longitude) => {
-    console.log(id, latitude, longitude);
     setId(id);
     setCoordinate({
       latitude: Number(latitude),
@@ -108,32 +107,6 @@ export const Map = ({navigation}) => {
           pinColor="blue"
           onClick={() => doMapDetail()}
         />
-        {/* <Marker coordinate={P0} onClick={() => console.warn('onClick! p0')} />
-        <Marker
-          coordinate={P2}
-          pinColor="red"
-          onClick={() => console.warn('onClick! p2')}
-        />
-        <Path
-          coordinates={[P0, P1]}
-          onClick={() => console.warn('onClick! path')}
-          width={10}
-        />
-        <Polyline
-          coordinates={[P1, P2]}
-          onClick={() => console.warn('onClick! polyline')}
-        />
-        <Circle
-          coordinate={P0}
-          color={'rgba(255,0,0,0.3)'}
-          radius={200}
-          onClick={() => console.warn('onClick! circle')}
-        />
-        <Polygon
-          coordinates={[P0, P1, P2]}
-          color={`rgba(0, 0, 0, 0.5)`}
-          onClick={() => console.warn('onClick! polygon')}
-        /> */}
       </NaverMapView>
     </View>
   );

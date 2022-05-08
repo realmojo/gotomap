@@ -4,6 +4,11 @@ export const PLACE_STATUS = {
   DONE: 'done',
 };
 
+export const VIEW_TYPE = {
+  LIST: 'list',
+  MAP: 'map',
+};
+
 export const SIDO = [
   {name_en: 'All', name_kr: '전체(시/도)'},
   {name_en: 'Seoul', name_kr: '서울특별시'},

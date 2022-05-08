@@ -1,9 +1,18 @@
 import axios from 'axios';
-import {API_URL, getId} from './index';
+import {API_URL} from './index';
 import {placeData} from '../mock/getPlace';
 import useStore from '../stores';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {userStore} = useStore();
+
+const getViewType = async () => {
+  return await AsyncStorage.getItem('viewType');
+};
+
+const setViewType = async value => {
+  AsyncStorage.setItem('viewType', value);
+};
 
 const addPlace = params => {
   return new Promise((resolve, reject) => {
@@ -36,17 +45,14 @@ const getPlaces = () => {
   console.log('getPlace Api');
   const userId = userStore.userId;
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(placeData);
-    }, 400);
-    // axios
-    //   .get(`${API_URL}/place/all?userId=${userId}`)
-    //   .then(res => {
-    //     resolve(res.data);
-    //   })
-    //   .catch(e => {
-    //     reject(e);
-    //   });
+    axios
+      .get(`${API_URL}/place/all?userId=${userId}`)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(e => {
+        reject(e);
+      });
   });
 };
 
@@ -78,4 +84,12 @@ const removePlace = objecId => {
   });
 };
 
-export {addPlace, getPlaces, getPlaceCount, updatePlaceStatus, removePlace};
+export {
+  addPlace,
+  getPlaces,
+  getPlaceCount,
+  updatePlaceStatus,
+  removePlace,
+  setViewType,
+  getViewType,
+};

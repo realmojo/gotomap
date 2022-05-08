@@ -9,38 +9,71 @@ import {
   TopNavigation,
   TopNavigationAction,
 } from '@ui-kitten/components';
+import {getPlaces} from '../api';
 import {observer} from 'mobx-react';
-import {PlaceList, PlaceMap} from '../components';
-import {PLACE_STATUS} from '../config/constants';
+import {PlaceList, PlaceMap, LoadingIndicator, Error} from '../components';
+import {PLACE_STATUS, VIEW_TYPE} from '../config/constants';
+import {useQuery} from 'react-query';
+import useStore from '../stores';
 
 const MenuIcon = props => <Icon {...props} name="more-vertical" />;
-
 const StarIcon = (color, name) => {
   return <Icon style={styles.icon} fill={color} name={name} />;
 };
-
+const mapIcon = props => <Icon {...props} fill="#8F9BB3" name="map-outline" />;
 const listIcon = props => (
   <Icon {...props} fill="#8F9BB3" name="list-outline" />
 );
 
-const mapIcon = props => <Icon {...props} fill="#8F9BB3" name="map-outline" />;
-
-export const Home = observer(({navigation}) => {
+export const Place = observer(({navigation}) => {
+  const {placeStore} = useStore();
+  const [allData, setAllData] = useState([]);
+  const [isFirst, setIsFirst] = useState(true);
   const [statusValue, setStatusValue] = useState('all');
   const [starIconColor, setStarIconColor] = useState('#d2d2d2');
   const [starIconName, setStarIconName] = useState('star');
   const [menuVisible, setMenuVisible] = useState(false);
-  const [viewType, setViewType] = useState('list');
+  // const [viewType, setViewType] = useState('list');
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
+
+  const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
+    onSuccess: items => {
+      if (isFirst) {
+        console.log('items all loading');
+        setAllData(items);
+        setIsFirst(false);
+      }
+      console.log('getPlaces reload');
+    },
+    select: items => {
+      console.log('select filter item');
+      const filterItems = items.filter(item => {
+        if (statusValue === PLACE_STATUS.ALL) {
+          return true;
+        } else if (statusValue === PLACE_STATUS.DONE) {
+          return item.status === PLACE_STATUS.DONE;
+        } else if (statusValue === PLACE_STATUS.BACKLOG)
+          return item.status === PLACE_STATUS.BACKLOG;
+      });
+      return filterItems;
+    },
+    onError: () => {
+      console.log('getPlaces failed');
+    },
+  });
 
   const renderMenuAction = () => (
     <TopNavigationAction icon={MenuIcon} onPress={toggleMenu} />
   );
 
   const doViewType = value => {
-    setViewType(value);
+    if (value === VIEW_TYPE.LIST) {
+      placeStore.setViewType(VIEW_TYPE.LIST);
+    } else if (value === VIEW_TYPE.MAP) {
+      placeStore.setViewType(VIEW_TYPE.MAP);
+    }
     toggleMenu();
   };
 
@@ -98,16 +131,25 @@ export const Home = observer(({navigation}) => {
     </View>
   );
 
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+
+  if (error) {
+    return <Error />;
+  }
+
   return (
     <View>
       <TopNavigation
         title={renderTitle}
         accessoryRight={renderOverflowMenuAction}
       />
-      {viewType === 'list' ? (
-        <PlaceList statusType={statusValue} navigation={navigation} />
+      {/* <Text>123</Text> */}
+      {placeStore.viewType === VIEW_TYPE.LIST ? (
+        <PlaceList allData={allData} data={data} navigation={navigation} />
       ) : (
-        <PlaceMap />
+        <PlaceMap allData={allData} data={data} navigation={navigation} />
       )}
     </View>
   );

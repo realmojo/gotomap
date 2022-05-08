@@ -9,11 +9,9 @@ import {
 } from 'react-native';
 import {Carousel} from '../components';
 
-import {Text, Button} from '@ui-kitten/components';
+import {Text, Button, Layout} from '@ui-kitten/components';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
-
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {getMapDetailInfo, addPlace} from '../api';
 import moment from 'moment';
 import useStore from '../stores';
@@ -22,12 +20,7 @@ import {getSidoAndSigungu} from '../utils';
 
 const iconColor = '#dadbdd';
 const iconSize = 18;
-
 const toastConfig = {
-  /*
-    Overwrite 'success' type,
-    by modifying the existing `BaseToast` component
-  */
   success: props => (
     <BaseToast
       {...props}
@@ -164,9 +157,10 @@ export const MapDetail = ({route: {params}}) => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <Layout style={{flex: 1}}>
       <ScrollView>
-        <View style={styles.container}>
+        <Layout style={styles.container} level="1">
+          {/* <View> */}
           {item.imageURL && (
             <Carousel
               page={page}
@@ -273,7 +267,8 @@ export const MapDetail = ({route: {params}}) => {
               </Text>
             </View>
           )}
-        </View>
+          {/* </View> */}
+        </Layout>
       </ScrollView>
       <Toast config={toastConfig} />
       <View>
@@ -286,7 +281,7 @@ export const MapDetail = ({route: {params}}) => {
           {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
         </Button>
       </View>
-    </View>
+    </Layout>
   );
 };
 
@@ -308,7 +303,7 @@ const styles = StyleSheet.create({
     color: '#8f8f8f',
   },
   title: {
-    color: 'black',
+    // color: 'black',
   },
   textWrap: {
     flexDirection: 'row',
@@ -322,7 +317,7 @@ const styles = StyleSheet.create({
   },
   text: {
     paddingRight: 20,
-    color: 'black',
+    // color: 'black',
   },
   goText: {
     color: 'white',

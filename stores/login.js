@@ -31,7 +31,6 @@ const loginStore = observable({
     const res = await getKakaoProfile();
     return res;
   },
-  number: 1,
   setIslogin(value) {
     runInAction(() => {
       this.isLogin = value;

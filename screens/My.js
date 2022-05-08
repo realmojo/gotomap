@@ -1,33 +1,13 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {
-  Avatar,
-  Layout,
-  Text,
-  List,
-  ListItem,
-  Divider,
-  Button,
-} from '@ui-kitten/components';
+import {StyleSheet, View, Linking, Image} from 'react-native';
+import {Layout, Text, ListItem, Divider} from '@ui-kitten/components';
 import useStore from '../stores';
 import {observer} from 'mobx-react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const datda = new Array(8).fill({
-  title: 'Item',
-  description: 'Description for Item',
-});
-
 const removeId = async () => {
   await AsyncStorage.removeItem('id');
 };
-
-const renderItem = ({item, index}) => (
-  <ListItem
-    title={`${item.title} ${index + 1}`}
-    description={`${item.description} ${index + 1}`}
-  />
-);
 
 export const My = observer(() => {
   const {loginStore, userStore} = useStore();
@@ -37,69 +17,86 @@ export const My = observer(() => {
     loginStore.setIslogin(false);
   };
 
-  // const {data} = useQuery('getPlaceCount', getPlaceCount, {
-  //   onSuccess: item => {
-  //     console.log(item);
-  //   },
-  // });
-
   useEffect(() => {
     userStore.getPlaceCount();
   }, []);
 
   return (
-    <Layout style={{flex: 1}}>
-      <ListItem
-        title={() => <Text category="h3">{name}</Text>}
-        description="A set of React Native components"
-        accessoryLeft={() => (
-          <Avatar
+    <Layout>
+      <View style={styles.container}>
+        <View style={styles.logoWrap}>
+          <Image
             style={styles.avatar}
-            source={{
-              uri: profileImage ? profileImage : '',
-            }}
+            source={
+              profileImage
+                ? {uri: profileImage}
+                : require('../assets/images/logo.png')
+            }
           />
-        )}
-      />
-      <Layout style={styles.countContainer} level="1">
-        <View style={styles.countWrap}>
-          <Text style={styles.countTitle}>전체</Text>
-          <Text style={styles.countText}>10</Text>
+          <Text category="h3">{name}</Text>
         </View>
-        <View style={styles.countWrap}>
-          <Text style={styles.countTitle}>가봤지</Text>
-          <Text style={styles.countText}>10</Text>
-        </View>
-        <View style={styles.countWrap}>
-          <Text style={styles.countTitle}>가봐야지</Text>
-          <Text style={styles.countText}>10</Text>
-        </View>
-      </Layout>
-
+        <Layout style={styles.countContainer} level="1">
+          <View style={styles.countWrap}>
+            <Text style={styles.countTitle}>전체</Text>
+            <Text style={styles.countText}>
+              {userStore.countInfo.totalCount}
+            </Text>
+          </View>
+          <View style={styles.countWrap}>
+            <Text style={styles.countTitle}>가봤지</Text>
+            <Text style={styles.countText}>
+              {userStore.countInfo.doneCount}
+            </Text>
+          </View>
+          <View style={styles.countWrap}>
+            <Text style={styles.countTitle}>가봐야지</Text>
+            <Text style={styles.countText}>
+              {userStore.countInfo.backlogCount}
+            </Text>
+          </View>
+        </Layout>
+      </View>
       <ListItem
+        style={styles.listItem}
+        title="피드백을 주세요"
+        onPress={() =>
+          Linking.openURL(
+            'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
+          )
+        }
+      />
+      <Divider />
+      <ListItem
+        style={styles.listItem}
         title="로그아웃"
-        description="계정을 로그아웃 합니다."
         onPress={() => doLogout()}
       />
       <Divider />
-      {/* <List
-        style={styles.container}
-        data={datda}
-        ItemSeparatorComponent={Divider}
-        renderItem={renderItem}
-      /> */}
-      {/* <Button onPress={() => doLogout()}>Logout</Button> */}
     </Layout>
   );
 });
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#ffcb66',
+  },
+  logoWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
   avatar: {
-    margin: 8,
-    width: 100,
-    height: 100,
+    borderRadius: 90,
+    marginTop: 40,
+    marginBottom: 20,
+    width: 130,
+    height: 130,
+  },
+  listItem: {
+    paddingVertical: 20,
   },
   countContainer: {
+    backgroundColor: '#ffcb66',
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingVertical: 10,
@@ -107,8 +104,8 @@ const styles = StyleSheet.create({
   countWrap: {
     flex: 1,
     borderRightWidth: 1,
-    borderRightColor: '#dadada',
-    // width: '33.3%',
+    borderRightColor: '#ffb629',
+    paddingVertical: 10,
   },
   countTitle: {
     textAlign: 'center',
