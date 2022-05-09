@@ -3,7 +3,7 @@ import {StyleSheet, View} from 'react-native';
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {PLACE_STATUS} from '../config/constants';
 
-const PlaceMap = ({data, navigation}) => {
+const PlaceMap = ({data, navigation, callbackModal}) => {
   const [coordinate, setCoordinate] = useState({
     longitude: 126.97601589994,
     latitude: 37.5632555012193,
@@ -29,7 +29,7 @@ const PlaceMap = ({data, navigation}) => {
               latitude: item.latitude,
             }}
             pinColor={item.status === PLACE_STATUS.DONE ? 'red' : 'blue'}
-            onClick={() => doMapDetail(item.placeId)}
+            onClick={() => callbackModal(item._id)}
           />
         ))}
       </NaverMapView>

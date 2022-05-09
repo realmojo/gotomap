@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Card, Text, ListItem, Avatar, Button} from '@ui-kitten/components';
-import {PLACE_STATUS} from '../config/constants';
+import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {TextDetail} from './index';
 import {updatePlaceStatus} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
@@ -15,7 +15,7 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
       const previosValue = queryClient.getQueryData('getPlaces');
       queryClient.setQueryData('getPlaces', places => {
         const findIndex = places.findIndex(place => {
-          return place._id === item.id;
+          return place._id === item._id;
         });
         places[findIndex].status = item.status;
         return places;
@@ -35,14 +35,14 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
   };
 
   const renderItemHeader = item => {
-    const {_id: id, title, category, imageURL, status} = item;
+    const {_id, title, category, imageURL, status} = item;
     return (
       <ListItem
         style={{padding: 10}}
         title={title}
         description={category}
         onPress={() => {
-          callbackModal(id);
+          callbackModal(_id);
         }}
         accessoryLeft={() => (
           <Avatar
@@ -58,7 +58,7 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
             appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
             onPress={() =>
               doUpdatePlaceStatus({
-                id,
+                _id,
                 status:
                   status === PLACE_STATUS.BACKLOG
                     ? PLACE_STATUS.DONE
@@ -67,7 +67,9 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
             }
             status="warning">
             <Text style={{fontSize: 19}}>
-              {status === PLACE_STATUS.BACKLOG ? '가봐야지' : '가봤지'}
+              {status === PLACE_STATUS.BACKLOG
+                ? PLACE_STATUS_KR.BACKLOG
+                : PLACE_STATUS_KR.DONE}
             </Text>
           </Button>
         )}
@@ -82,12 +84,15 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
           style={styles.item}
           status="basic"
           header={() => renderItemHeader(item.item)}
-          onPress={() => doStack(placeId)}>
+          // onPress={() => doStack(placeId)}
+          onPress={() => {
+            callbackModal(item.item._id);
+          }}>
           <TextDetail iconName="map-marker" text={fullAddress} />
         </Card>
       </View>
     ),
-    [item.item.status],
+    [item.item.status, item.item.title],
   );
 };
 

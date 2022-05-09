@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {API_URL} from './index';
-import {placeData} from '../mock/getPlace';
 import useStore from '../stores';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,11 +39,11 @@ const addPlace = params => {
   });
 };
 
-const updatePlaceStatus = async ({id, status}) => {
+const updatePlaceStatus = async ({_id, status}) => {
   const userId = userStore.userId;
   return new Promise(resolve => {
     axios
-      .patch(`${API_URL}/place/${id}/status?userId=${userId}&status=${status}`)
+      .patch(`${API_URL}/place/${_id}/status?userId=${userId}&status=${status}`)
       .then(res => {
         resolve(res.data);
       })

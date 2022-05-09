@@ -4,12 +4,13 @@ import {Spinner} from '@ui-kitten/components';
 
 const LoadingIndicator = () => (
   <View style={styles.indicator}>
-    <Spinner size="small" status="control" />
+    <Spinner size="small" status="warning" />
   </View>
 );
 
 const styles = StyleSheet.create({
   indicator: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

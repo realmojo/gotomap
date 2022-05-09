@@ -28,11 +28,7 @@ export const Login = () => {
     placeStore.initViewType();
   });
   if (isLoading) {
-    return (
-      <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Spinner status="warning" />
-      </Layout>
-    );
+    return <LoadingIndicator />;
   }
   return (
     <Layout style={styles.container}>

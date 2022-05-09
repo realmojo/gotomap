@@ -5,23 +5,20 @@ import {
   IndexPath,
   Layout,
   Select,
-  Text,
-  Button,
   SelectItem,
+  Icon,
 } from '@ui-kitten/components';
 import {SIDO, SIGUNGU} from '../config/constants';
 import {useQueryClient} from 'react-query';
 import {PlaceListItem} from './index';
 import {Nothing} from './Nothing';
-import Modal from 'react-native-modal';
 
-const deviceWidth = Dimensions.get('window').width;
 const defaultSigungu = {
   name_en: 'All',
   name_kr: '전체(시/군/구)',
 };
 
-const PlaceList = ({allData, data, navigation}) => {
+const PlaceList = ({allData, data, navigation, callbackModal}) => {
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
@@ -31,7 +28,6 @@ const PlaceList = ({allData, data, navigation}) => {
     new IndexPath(0),
   );
   const [sigunguOptions, setSigunguOptions] = useState([]);
-  const [placeItem, setPlaceItem] = useState({});
 
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -87,41 +83,9 @@ const PlaceList = ({allData, data, navigation}) => {
 
     filterListData(sigunguOptions[index.row], 'sigungu');
   };
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
-  const callbackModal = async id => {
-    const item = await getPlace(id);
-    console.log(item);
-    console.log(`${id} callback Modal`);
-  };
 
   return (
     <View style={{marginBottom: 210}}>
-      {/* <Button onPress={toggleModal}>Show Modal</Button> */}
-      <Modal
-        style={styles.bottomModal}
-        isVisible={isModalVisible}
-        deviceWidth={deviceWidth}
-        onBackdropPress={toggleModal}>
-        <View style={styles.modalContent}>
-          <Button onPress={toggleModal}>Close Modal</Button>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-          <Text>I am the modal content!</Text>
-        </View>
-      </Modal>
       <Layout style={styles.layoutContainer} level="2">
         <Select
           style={styles.select}
@@ -166,18 +130,6 @@ const PlaceList = ({allData, data, navigation}) => {
   );
 };
 const styles = StyleSheet.create({
-  bottomModal: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-  },
   image: {
     width: '100%',
     height: 200,

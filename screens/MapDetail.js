@@ -72,6 +72,9 @@ export const MapDetail = ({route: {params}}) => {
       addressAbbr,
       fullRoadAddress,
       description,
+      options,
+      keywords,
+      bizHour,
     } = item;
     const {id: userId} = loginStore.userInfo;
     const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
@@ -87,11 +90,18 @@ export const MapDetail = ({route: {params}}) => {
       imageURL,
       category,
       phone,
+      options: optionText(options),
+      keywords: keywords ? keywords.join('/') : '',
+      openHour: bizInfoText(bizHour, 0),
+      closeHour: bizInfoText(bizHour, 1),
       status: PLACE_STATUS.BACKLOG,
+      memo: '',
       sido,
       sigungu,
       regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
+
+    console.log(params);
 
     try {
       const res = await addPlace(params);
@@ -104,11 +114,13 @@ export const MapDetail = ({route: {params}}) => {
   };
 
   const bizInfoText = (item, number) => {
-    const bizInfo = item[number];
-    if (bizInfo) {
-      return `${bizInfo.isDayOff ? '영업 중' : '영업 종료'}: ${bizInfo.type} ${
-        bizInfo.startTime
-      }~${bizInfo.endTime} ${bizInfo.description}`;
+    if (item !== null) {
+      const bizInfo = item[number];
+      if (bizInfo) {
+        return `${bizInfo.isDayOff ? '영업 중' : '영업 종료'}: ${
+          bizInfo.type
+        } ${bizInfo.startTime}~${bizInfo.endTime} ${bizInfo.description}`;
+      }
     }
     return '앗! 영업시간 정보가 없네요';
   };
@@ -174,7 +186,8 @@ export const MapDetail = ({route: {params}}) => {
           {item.categories !== undefined && item.categories.length === 2 && (
             <Text style={styles.category}>{item.categories[1]}</Text>
           )}
-          <Text category="h1" style={styles.title}>
+
+          <Text category="h3" style={styles.title}>
             {item.name}
           </Text>
           {isItem(item.phone) && (
@@ -233,7 +246,7 @@ export const MapDetail = ({route: {params}}) => {
             <View style={styles.textWrap}>
               <MaterialCommunityIcons
                 style={styles.icon}
-                name="clock-time-eight-outline"
+                name="clock-time-nine-outline"
                 color={iconColor}
                 size={iconSize}
               />
@@ -244,7 +257,7 @@ export const MapDetail = ({route: {params}}) => {
             <View style={styles.textWrap}>
               <MaterialCommunityIcons
                 style={styles.icon}
-                name="clock-time-eight-outline"
+                name="clock-time-five-outline"
                 color={iconColor}
                 size={iconSize}
               />
@@ -299,8 +312,8 @@ const styles = StyleSheet.create({
     minHeight: 250,
   },
   category: {
-    marginTop: 10,
-    color: '#8f8f8f',
+    marginTop: 12,
+    color: '#aaa',
   },
   title: {
     // color: 'black',
@@ -317,7 +330,6 @@ const styles = StyleSheet.create({
   },
   text: {
     paddingRight: 20,
-    // color: 'black',
   },
   goText: {
     color: 'white',

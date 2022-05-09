@@ -4,6 +4,12 @@ export const PLACE_STATUS = {
   DONE: 'done',
 };
 
+export const PLACE_STATUS_KR = {
+  ALL: '전체',
+  BACKLOG: '가봐야지',
+  DONE: '가봤지',
+};
+
 export const VIEW_TYPE = {
   LIST: 'list',
   MAP: 'map',
