@@ -6,7 +6,7 @@ import {TextDetail} from './index';
 import {updatePlaceStatus} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
-const PlaceListItem = ({item, navigation}) => {
+const PlaceListItem = ({callbackModal, item, navigation}) => {
   const {fullAddress, placeId} = item.item;
   const queryClient = useQueryClient();
 
@@ -41,6 +41,9 @@ const PlaceListItem = ({item, navigation}) => {
         style={{padding: 10}}
         title={title}
         description={category}
+        onPress={() => {
+          callbackModal(id);
+        }}
         accessoryLeft={() => (
           <Avatar
             source={

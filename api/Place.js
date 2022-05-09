@@ -14,6 +14,19 @@ const setViewType = async value => {
   AsyncStorage.setItem('viewType', value);
 };
 
+const getPlace = id => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`${API_URL}/place/${id}`)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
 const addPlace = params => {
   return new Promise((resolve, reject) => {
     axios
@@ -86,6 +99,7 @@ const removePlace = objecId => {
 
 export {
   addPlace,
+  getPlace,
   getPlaces,
   getPlaceCount,
   updatePlaceStatus,
