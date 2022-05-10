@@ -19,6 +19,7 @@ const addUser = params => {
     regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
   };
   return new Promise((resolve, reject) => {
+    console.log(`${API_URL}/user`);
     axios
       .post(`${API_URL}/user`, param)
       .then(res => {

@@ -88,7 +88,7 @@ export const MapDetail = ({route: {params}}) => {
       phone,
       options: optionText(options),
       keywords: keywords ? keywords.join('/') : '',
-      bizhourInfo,
+      bizhourInfo: bizhourInfo ? bizhourInfo : '',
       status: PLACE_STATUS.BACKLOG,
       memo: '',
       sido,

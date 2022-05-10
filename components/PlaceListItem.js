@@ -3,15 +3,18 @@ import {StyleSheet, View, Alert} from 'react-native';
 import {
   Card,
   Text,
+  Icon,
   Input,
-  ListItem,
   Avatar,
   Button,
+  ListItem,
 } from '@ui-kitten/components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {TextDetail} from './index';
 import {updatePlaceStatus, updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
+
+const editIcon = props => <Icon {...props} name="edit-outline" />;
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   const {fullAddress, latitude, longitude, memo} = item.item;
@@ -129,26 +132,37 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
           />
         )}
         accessoryRight={() => (
-          <Button
-            style={{marginRight: 10}}
-            size="tiny"
-            appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
-            onPress={() =>
-              doUpdatePlaceStatus({
-                _id,
-                status:
-                  status === PLACE_STATUS.BACKLOG
-                    ? PLACE_STATUS.DONE
-                    : PLACE_STATUS.BACKLOG,
-              })
-            }
-            status="warning">
-            <Text style={{fontSize: 19}}>
-              {status === PLACE_STATUS.BACKLOG
-                ? PLACE_STATUS_KR.BACKLOG
-                : PLACE_STATUS_KR.DONE}
-            </Text>
-          </Button>
+          <>
+            <Button
+              size="small"
+              appearance="ghost"
+              status="warning"
+              accessoryLeft={editIcon}
+              onPress={() => setIsMemoInput(!isMemoInput)}
+            />
+            <Button
+              style={{marginRight: 10}}
+              size="tiny"
+              appearance={
+                status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
+              }
+              onPress={() =>
+                doUpdatePlaceStatus({
+                  _id,
+                  status:
+                    status === PLACE_STATUS.BACKLOG
+                      ? PLACE_STATUS.DONE
+                      : PLACE_STATUS.BACKLOG,
+                })
+              }
+              status="warning">
+              <Text style={{fontSize: 19}}>
+                {status === PLACE_STATUS.BACKLOG
+                  ? PLACE_STATUS_KR.BACKLOG
+                  : PLACE_STATUS_KR.DONE}
+              </Text>
+            </Button>
+          </>
         )}
       />
     );
@@ -172,28 +186,29 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
               <Input
                 style={{padding: 10}}
                 placeholder="입력하고 싶은 내용을 적어주세요"
-                status="success"
                 size="medium"
+                status="warning"
                 multiline={true}
                 textStyle={{minHeight: 64}}
                 value={value}
+                onBlur={() => doSave(item.item._id)}
                 onChangeText={nextValue => setValue(nextValue)}
               />
-              <Button
+              {/* <Button
                 style={{marginHorizontal: 10}}
                 size="small"
-                status="success"
+                status="warning"
                 onPress={() => doSave(item.item._id)}>
                 저장
-              </Button>
+              </Button> */}
             </>
-          ) : (
+          ) : memo ? (
             <TextDetail
               iconName="pencil-outline"
-              text={memo ? memo : '클릭하여 메모를 작성해보세요.'}
-              doPress={() => setIsMemoInput(true)}
+              text={memo}
+              // doPress={() => setIsMemoInput(true)}
             />
-          )}
+          ) : null}
         </Card>
       </View>
     ),

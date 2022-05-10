@@ -54,12 +54,10 @@ const updatePlaceStatus = async ({_id, status}) => {
 };
 
 const updatePlaceMemo = async ({_id, memo}) => {
-  console.log(_id, memo);
   const userId = userStore.userId;
-  console.log(`${API_URL}/place/${_id}/${userId}/memo`);
   return new Promise(resolve => {
     axios
-      .patch(`${API_URL}/place/${_id}/${userId}/memo`, {
+      .patch(`${API_URL}/place/${_id}/memo?userId=${userId}`, {
         memo,
       })
       .then(res => {

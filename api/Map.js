@@ -1,13 +1,24 @@
 import axios from 'axios';
-import {MAP_API_URL} from './index';
+import {API_URL} from './index';
+import Geolocation from '@react-native-community/geolocation';
 
-const getSearchPlaces = text => {
+const getCurrentGeoInfo = () => {
+  return new Promise(resolve => {
+    Geolocation.getCurrentPosition(info => {
+      resolve({
+        latitude: info.coords.latitude,
+        longitude: info.coords.longitude,
+      });
+    });
+  });
+};
+
+const getSearchPlaces = async text => {
+  const {latitude, longitude} = await getCurrentGeoInfo();
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `${MAP_API_URL}/instantSearch?lang=ko&caller=pcweb&types=place,address,bus&coords=37.51708600000052,126.899465946063&query=${encodeURI(
-          text,
-        )}`,
+        `${API_URL}/map/search/place/${text}?latitude=${latitude}&longitude=${longitude}`,
       )
       .then(res => {
         resolve(res.data);
@@ -21,7 +32,7 @@ const getSearchPlaces = text => {
 const getMapDetailInfo = id => {
   return new Promise(resolve => {
     axios
-      .get(`${MAP_API_URL}/sites/summary/${id}?lang=ko`)
+      .get(`${API_URL}/map/search/${id}`)
       .then(res => {
         resolve(res.data);
       })

@@ -1,5 +1,4 @@
 import KakaoSDK from '@actbase/react-kakaosdk';
-// import RNConfigReader from "react-native-config-reader"
 
 const kakaoLogin = async () => {
   try {
