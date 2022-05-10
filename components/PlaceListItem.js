@@ -6,8 +6,8 @@ import {TextDetail} from './index';
 import {updatePlaceStatus} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
-const PlaceListItem = ({callbackModal, item, navigation}) => {
-  const {fullAddress, placeId} = item.item;
+const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
+  const {fullAddress} = item.item;
   const queryClient = useQueryClient();
 
   const mutation = useMutation(params => updatePlaceStatus(params), {
@@ -30,9 +30,6 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
     },
     [mutation],
   );
-  const doStack = id => {
-    navigation.push('mapDetail', {id});
-  };
 
   const renderItemHeader = item => {
     const {_id, title, category, imageURL, status} = item;
@@ -54,7 +51,7 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
         accessoryRight={() => (
           <Button
             style={{margin: 10}}
-            size="small"
+            size="tiny"
             appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
             onPress={() =>
               doUpdatePlaceStatus({
@@ -84,11 +81,19 @@ const PlaceListItem = ({callbackModal, item, navigation}) => {
           style={styles.item}
           status="basic"
           header={() => renderItemHeader(item.item)}
-          // onPress={() => doStack(placeId)}
           onPress={() => {
             callbackModal(item.item._id);
           }}>
           <TextDetail iconName="map-marker" text={fullAddress} />
+          <Button
+            onPress={() =>
+              naviMapInfo({
+                latitude: item.item.latitude,
+                longitude: item.item.longitude,
+              })
+            }>
+            지도
+          </Button>
         </Card>
       </View>
     ),

@@ -5,3 +5,4 @@ export * from './TextDetail';
 export * from './PlaceListItem';
 export * from './LoadingIndicator';
 export * from './Error';
+export * from './PlaceModalDetailText';

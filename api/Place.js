@@ -56,21 +56,22 @@ const updatePlaceStatus = async ({_id, status}) => {
 const getPlaces = () => {
   console.log('getPlace Api');
   const userId = userStore.userId;
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${API_URL}/place/all?userId=${userId}`)
-      .then(res => {
-        resolve(res.data);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
+  if (userId) {
+    return new Promise((resolve, reject) => {
+      axios
+        .get(`${API_URL}/place/all?userId=${userId}`)
+        .then(res => {
+          resolve(res.data);
+        })
+        .catch(e => {
+          reject(e);
+        });
+    });
+  }
 };
 
 const getPlaceCount = () => {
   const userId = userStore.userId;
-  console.log(userId);
   return new Promise((resolve, reject) => {
     axios
       .get(`${API_URL}/place/allCount?userId=${userId}`)

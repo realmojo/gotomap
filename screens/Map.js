@@ -1,11 +1,5 @@
 import React, {useState, useMemo, useCallback} from 'react';
-import NaverMapView, {
-  Circle,
-  Marker,
-  Path,
-  Polyline,
-  Polygon,
-} from 'react-native-nmap';
+import NaverMapView, {Marker} from 'react-native-nmap';
 import {StyleSheet, View, Text} from 'react-native';
 import {Layout, Input, Divider, List, ListItem} from '@ui-kitten/components';
 import {debounce} from 'lodash';

@@ -1,14 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  Image,
-  Dimensions,
-  ScrollView,
-  Linking,
-} from 'react-native';
-import {Carousel} from '../components';
-
+import {StyleSheet, View, Image, Dimensions, ScrollView} from 'react-native';
+import {Carousel, PlaceModalDetailText} from '../components';
 import {Text, Button, Layout} from '@ui-kitten/components';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,10 +8,8 @@ import {getMapDetailInfo, addPlace} from '../api';
 import moment from 'moment';
 import useStore from '../stores';
 import {PLACE_STATUS} from '../config/constants';
-import {getSidoAndSigungu} from '../utils';
+import {getSidoAndSigungu, isEmpty, isEmptyArray} from '../utils';
 
-const iconColor = '#dadbdd';
-const iconSize = 18;
 const toastConfig = {
   success: props => (
     <BaseToast
@@ -74,7 +64,7 @@ export const MapDetail = ({route: {params}}) => {
       description,
       options,
       keywords,
-      bizHour,
+      bizhourInfo,
     } = item;
     const {id: userId} = loginStore.userInfo;
     const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
@@ -92,16 +82,13 @@ export const MapDetail = ({route: {params}}) => {
       phone,
       options: optionText(options),
       keywords: keywords ? keywords.join('/') : '',
-      openHour: bizInfoText(bizHour, 0),
-      closeHour: bizInfoText(bizHour, 1),
+      bizhourInfo,
       status: PLACE_STATUS.BACKLOG,
       memo: '',
       sido,
       sigungu,
       regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
-
-    console.log(params);
 
     try {
       const res = await addPlace(params);
@@ -113,20 +100,8 @@ export const MapDetail = ({route: {params}}) => {
     }
   };
 
-  const bizInfoText = (item, number) => {
-    if (item !== null) {
-      const bizInfo = item[number];
-      if (bizInfo) {
-        return `${bizInfo.isDayOff ? '영업 중' : '영업 종료'}: ${
-          bizInfo.type
-        } ${bizInfo.startTime}~${bizInfo.endTime} ${bizInfo.description}`;
-      }
-    }
-    return '앗! 영업시간 정보가 없네요';
-  };
-
   const optionText = items => {
-    if (isItem(items)) {
+    if (isEmpty(items)) {
       const t = [];
       for (const item of items) {
         t.push(item.name);
@@ -136,13 +111,10 @@ export const MapDetail = ({route: {params}}) => {
     return '앗! 옵션 정보가 없네요';
   };
 
-  const isItem = value => {
-    return value !== undefined && value !== null;
-  };
-
   useEffect(() => {
     async function fetchData() {
       const data = await getMapDetailInfo(id);
+      console.log(data.bizhourInfo);
       setItem(data);
     }
     fetchData();
@@ -187,100 +159,52 @@ export const MapDetail = ({route: {params}}) => {
             <Text style={styles.category}>{item.categories[1]}</Text>
           )}
 
-          <Text category="h3" style={styles.title}>
+          <Text category="h4" style={styles.title}>
             {item.name}
           </Text>
-          {isItem(item.phone) && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="phone"
-                color={iconColor}
-                size={iconSize}
-              />
-              {item.phone ? (
-                <Text
-                  style={styles.phoneText}
-                  onPress={() => Linking.openURL(`tel:${item.phone}`)}>
-                  {item.phone}
-                </Text>
-              ) : (
-                <Text>앗! 전화번호가 없어요</Text>
-              )}
-            </View>
+          {isEmpty(item.phone) && (
+            <PlaceModalDetailText
+              iconName="phone"
+              category="연락처"
+              title={item.phone}
+            />
           )}
-          {isItem(item.fullRoadAddress) && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="map-marker"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text style={styles.text}>{item.fullRoadAddress}</Text>
-            </View>
-          )}
-          {isItem(item.options) && item.options.length > 0 && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="cube"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text style={styles.text}>{optionText(item.options)}</Text>
-            </View>
-          )}
-          {item.keywords !== undefined && item.keywords.length > 0 && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="key"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text style={styles.text}>{item.keywords.join('/')}</Text>
-            </View>
-          )}
-          {isItem(item.bizHour) && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="clock-time-nine-outline"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text style={styles.text}>{bizInfoText(item.bizHour, 0)}</Text>
-            </View>
-          )}
-          {isItem(item.bizHour) && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="clock-time-five-outline"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text style={styles.text}>{bizInfoText(item.bizHour, 1)}</Text>
-            </View>
+          {isEmpty(item.fullRoadAddress) && (
+            <PlaceModalDetailText
+              iconName="map-marker"
+              category="도로명주소"
+              title={item.fullRoadAddress}
+            />
           )}
 
-          {isItem(item.description) && (
-            <View style={styles.textWrap}>
-              <MaterialCommunityIcons
-                style={styles.icon}
-                name="note-outline"
-                color={iconColor}
-                size={iconSize}
-              />
-              <Text numberOfLines={20} style={styles.text}>
-                {item.description !== ''
-                  ? item.description
-                  : '앗! 설명이 없네요'}
-              </Text>
-            </View>
+          {isEmptyArray(item.options) && (
+            <PlaceModalDetailText
+              iconName="cube"
+              category="옵션"
+              title={optionText(item.options)}
+            />
           )}
-          {/* </View> */}
+          {isEmptyArray(item.keywords) && (
+            <PlaceModalDetailText
+              iconName="key"
+              category="키워드"
+              title={item.keywords.join('/')}
+            />
+          )}
+          {isEmpty(item.bizhourInfo) && (
+            <PlaceModalDetailText
+              iconName="clock-time-nine-outline"
+              category="영업시간"
+              title={item.bizhourInfo}
+            />
+          )}
+          {isEmpty(item.description) && (
+            <PlaceModalDetailText
+              iconName="note-outline"
+              category="설명"
+              title={item.description}
+            />
+          )}
         </Layout>
       </ScrollView>
       <Toast config={toastConfig} />
@@ -314,28 +238,12 @@ const styles = StyleSheet.create({
   category: {
     marginTop: 12,
     color: '#aaa',
+    fontSize: 14,
   },
   title: {
     // color: 'black',
   },
-  textWrap: {
-    flexDirection: 'row',
-    paddingBottom: 10,
-    paddingTop: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#dadbdd',
-  },
-  icon: {
-    marginRight: 4,
-  },
-  text: {
-    paddingRight: 20,
-  },
   goText: {
     color: 'white',
-  },
-  phoneText: {
-    color: '#FFAA00',
-    textDecorationLine: 'underline',
   },
 });

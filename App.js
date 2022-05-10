@@ -3,7 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {BottomTab, Detail, MapDetail, Login} from './screens';
+import {BottomTab, Detail, MapDetail, Login, MapInfo} from './screens';
 import {
   createStackNavigator,
   CardStyleInterpolators,
@@ -17,9 +17,6 @@ const Stack = createStackNavigator();
 
 const TotalStack = observer(() => {
   const {loginStore} = useStore();
-  const doClick = () => {
-    loginStore.setIslogin(true);
-  };
   return (
     <>
       {!loginStore.isLogin ? (
@@ -46,6 +43,14 @@ const TotalStack = observer(() => {
             component={MapDetail}
             options={{
               title: '상세정보',
+              cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+            }}
+          />
+          <Stack.Screen
+            name="mapInfo"
+            component={MapInfo}
+            options={{
+              title: '지도',
               cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
             }}
           />

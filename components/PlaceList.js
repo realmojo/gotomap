@@ -1,12 +1,17 @@
 import React, {useState, useCallback} from 'react';
-import {StyleSheet, View, RefreshControl, Dimensions} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  RefreshControl,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import {
   List,
   IndexPath,
   Layout,
   Select,
   SelectItem,
-  Icon,
 } from '@ui-kitten/components';
 import {SIDO, SIGUNGU} from '../config/constants';
 import {useQueryClient} from 'react-query';
@@ -18,7 +23,7 @@ const defaultSigungu = {
   name_kr: '전체(시/군/구)',
 };
 
-const PlaceList = ({allData, data, navigation, callbackModal}) => {
+const PlaceList = ({allData, data, navigation, callbackModal, naviMapInfo}) => {
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
@@ -115,8 +120,8 @@ const PlaceList = ({allData, data, navigation, callbackModal}) => {
           renderItem={item => (
             <PlaceListItem
               item={item}
-              navigation={navigation}
               callbackModal={callbackModal}
+              naviMapInfo={naviMapInfo}
             />
           )}
           refreshControl={
@@ -124,7 +129,12 @@ const PlaceList = ({allData, data, navigation, callbackModal}) => {
           }
         />
       ) : (
-        <Nothing navigation={navigation} />
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <Nothing navigation={navigation} />
+        </ScrollView>
       )}
     </View>
   );

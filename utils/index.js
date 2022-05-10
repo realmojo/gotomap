@@ -12,4 +12,11 @@ const getSidoAndSigungu = (fullAddress, addressAbbr) => {
     sigungu,
   };
 };
-export {getSidoAndSigungu};
+
+const isEmpty = value => {
+  return value !== undefined && value !== null && value !== '';
+};
+const isEmptyArray = value => {
+  return value !== undefined && value !== null && value.length !== 0;
+};
+export {getSidoAndSigungu, isEmpty, isEmptyArray};
