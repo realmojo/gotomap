@@ -53,6 +53,24 @@ const updatePlaceStatus = async ({_id, status}) => {
   });
 };
 
+const updatePlaceMemo = async ({_id, memo}) => {
+  console.log(_id, memo);
+  const userId = userStore.userId;
+  console.log(`${API_URL}/place/${_id}/${userId}/memo`);
+  return new Promise(resolve => {
+    axios
+      .patch(`${API_URL}/place/${_id}/${userId}/memo`, {
+        memo,
+      })
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  });
+};
+
 const getPlaces = () => {
   console.log('getPlace Api');
   const userId = userStore.userId;
@@ -84,10 +102,10 @@ const getPlaceCount = () => {
   });
 };
 
-const removePlace = objecId => {
+const removePlace = _id => {
   return new Promise((resolve, reject) => {
     axios
-      .delete(`${API_URL}/place/${objecId}`)
+      .delete(`${API_URL}/place/${_id}`)
       .then(res => {
         resolve(res.data);
       })
@@ -103,6 +121,7 @@ export {
   getPlaces,
   getPlaceCount,
   updatePlaceStatus,
+  updatePlaceMemo,
   removePlace,
   setViewType,
   getViewType,

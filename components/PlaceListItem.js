@@ -1,48 +1,128 @@
-import React, {useCallback, useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Card, Text, ListItem, Avatar, Button} from '@ui-kitten/components';
+import React, {useCallback, useMemo, useState} from 'react';
+import {StyleSheet, View, Alert} from 'react-native';
+import {
+  Card,
+  Text,
+  Input,
+  ListItem,
+  Avatar,
+  Button,
+} from '@ui-kitten/components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {TextDetail} from './index';
-import {updatePlaceStatus} from '../api';
+import {updatePlaceStatus, updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
-  const {fullAddress} = item.item;
+  const {fullAddress, latitude, longitude, memo} = item.item;
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(params => updatePlaceStatus(params), {
+  const doDelete = (title, _id) => {
+    Alert.alert(
+      `${title} 장소를 삭제합니다.`,
+      '삭제를 하시면 복구를 하실 없습니다.',
+      [
+        {
+          text: '취소',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: '삭제',
+          onPress: () => {
+            doDeletePlaceStatus(_id);
+          },
+        },
+      ],
+    );
+  };
+
+  const doPress = () => {
+    naviMapInfo({latitude, longitude});
+  };
+
+  const [isMemoInput, setIsMemoInput] = useState(false);
+  const [value, setValue] = useState('');
+
+  const doSave = _id => {
+    setIsMemoInput(false);
+    doUpdatePlaceMemo({_id, memo: value});
+  };
+
+  const doUpdatePlaceStatus = useCallback(
+    params => {
+      updateMutation.mutate(params);
+    },
+    [updateMutation],
+  );
+
+  const doDeletePlaceStatus = useCallback(
+    params => {
+      deleteMutation.mutate(params);
+    },
+    [deleteMutation],
+  );
+
+  const doUpdatePlaceMemo = useCallback(
+    params => {
+      updateMutationMemo.mutate(params);
+    },
+    [updateMutationMemo],
+  );
+
+  const updateMutationMemo = useMutation(params => updatePlaceMemo(params), {
     onMutate: item => {
-      const previosValue = queryClient.getQueryData('getPlaces');
-      queryClient.setQueryData('getPlaces', places => {
+      const previousValue = queryClient.setQueryData('getPlaces', places => {
+        const findIndex = places.findIndex(place => {
+          return place._id === item._id;
+        });
+        places[findIndex].memo = item.memo;
+        return places;
+      });
+      return previousValue;
+    },
+  });
+
+  const deleteMutation = useMutation(params => removePlace(params), {
+    onMutate: item => {
+      const previosValue = queryClient.setQueryData('getPlaces', places => {
+        const newPlaces = places.filter(place => {
+          return place._id !== item;
+        });
+        return newPlaces;
+      });
+      return previosValue;
+    },
+  });
+
+  const updateMutation = useMutation(params => updatePlaceStatus(params), {
+    onMutate: item => {
+      const previousValue = queryClient.setQueryData('getPlaces', places => {
         const findIndex = places.findIndex(place => {
           return place._id === item._id;
         });
         places[findIndex].status = item.status;
         return places;
       });
-      return previosValue;
+      return previousValue;
     },
   });
 
-  const doUpdatePlaceStatus = useCallback(
-    params => {
-      mutation.mutate(params);
-    },
-    [mutation],
-  );
-
   const renderItemHeader = item => {
-    const {_id, title, category, imageURL, status} = item;
+    const {_id, title, category, imageURL, status, memo} = item;
     return (
       <ListItem
-        style={{padding: 10}}
         title={title}
         description={category}
         onPress={() => {
           callbackModal(_id);
         }}
+        onLongPress={() => {
+          doDelete(title, _id);
+        }}
         accessoryLeft={() => (
           <Avatar
+            style={{marginLeft: 10}}
             source={
               imageURL ? {uri: imageURL} : require('../assets/images/logo.png')
             }
@@ -50,7 +130,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
         )}
         accessoryRight={() => (
           <Button
-            style={{margin: 10}}
+            style={{marginRight: 10}}
             size="tiny"
             appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
             onPress={() =>
@@ -80,24 +160,44 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
         <Card
           style={styles.item}
           status="basic"
-          header={() => renderItemHeader(item.item)}
-          onPress={() => {
-            callbackModal(item.item._id);
-          }}>
-          <TextDetail iconName="map-marker" text={fullAddress} />
-          <Button
-            onPress={() =>
-              naviMapInfo({
-                latitude: item.item.latitude,
-                longitude: item.item.longitude,
-              })
-            }>
-            지도
-          </Button>
+          header={() => renderItemHeader(item.item)}>
+          <TextDetail
+            iconName="map-marker"
+            text={fullAddress}
+            doPress={doPress}
+          />
+
+          {isMemoInput ? (
+            <>
+              <Input
+                style={{padding: 10}}
+                placeholder="입력하고 싶은 내용을 적어주세요"
+                status="success"
+                size="medium"
+                multiline={true}
+                textStyle={{minHeight: 64}}
+                value={value}
+                onChangeText={nextValue => setValue(nextValue)}
+              />
+              <Button
+                style={{marginHorizontal: 10}}
+                size="small"
+                status="success"
+                onPress={() => doSave(item.item._id)}>
+                저장
+              </Button>
+            </>
+          ) : (
+            <TextDetail
+              iconName="pencil-outline"
+              text={memo ? memo : '클릭하여 메모를 작성해보세요.'}
+              doPress={() => setIsMemoInput(true)}
+            />
+          )}
         </Card>
       </View>
     ),
-    [item.item.status, item.item.title],
+    [item.item.status, item.item.title, item.item.memo, isMemoInput, value],
   );
 };
 

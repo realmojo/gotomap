@@ -5,23 +5,22 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const iconColor = '#dadbdd';
 const iconSize = 18;
-const phoneText = title => {
-  return (
-    <Text
-      style={{
-        color: '#FFAA00',
-        textDecorationLine: 'underline',
-        fontSize: 13,
-        marginLeft: 10,
-      }}
-      onPress={() => Linking.openURL(`tel:${title}`)}>
-      {title}
-    </Text>
-  );
-};
+const PhontText = ({title}) => (
+  <Text
+    style={{
+      color: '#FFAA00',
+      textDecorationLine: 'underline',
+      fontSize: 13,
+      marginLeft: 10,
+    }}
+    onPress={() => Linking.openURL(`tel:${title}`)}>
+    {title}
+  </Text>
+);
 export const PlaceModalDetailText = ({iconName, category, title}) => {
   return (
     <ListItem
+      // onPress={() => doUpdatePlaceMemo(title)}
       title={() => (
         <Text style={{fontSize: 12, marginLeft: 10, color: '#aaa'}}>
           {category}
@@ -29,7 +28,7 @@ export const PlaceModalDetailText = ({iconName, category, title}) => {
       )}
       description={() =>
         iconName === 'phone' ? (
-          phoneText(title)
+          <PhontText title={title} />
         ) : (
           <Text style={{fontSize: 13, marginLeft: 10}}>{title}</Text>
         )

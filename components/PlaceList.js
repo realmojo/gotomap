@@ -1,11 +1,5 @@
 import React, {useState, useCallback} from 'react';
-import {
-  StyleSheet,
-  View,
-  RefreshControl,
-  Dimensions,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, View, RefreshControl, ScrollView} from 'react-native';
 import {
   List,
   IndexPath,
@@ -23,7 +17,14 @@ const defaultSigungu = {
   name_kr: '전체(시/군/구)',
 };
 
-const PlaceList = ({allData, data, navigation, callbackModal, naviMapInfo}) => {
+const PlaceList = ({
+  allData,
+  data,
+  navigation,
+  callbackModal,
+  naviMapInfo,
+  setForceRefresh,
+}) => {
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
@@ -40,10 +41,13 @@ const PlaceList = ({allData, data, navigation, callbackModal, naviMapInfo}) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    setForceRefresh(true);
     queryClient.refetchQueries('getPlaces');
     setSelectedSido(SIDO[0]);
     setSelectedSigungu(defaultSigungu);
-    wait(1000).then(() => setRefreshing(false));
+    wait(1000).then(() => {
+      setRefreshing(false);
+    });
   }, []);
 
   const filterListData = useCallback(({name_en, name_kr}, type) => {
@@ -143,9 +147,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-  },
-  text: {
-    color: 'black',
   },
   layoutContainer: {
     flexDirection: 'row',

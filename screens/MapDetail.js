@@ -1,14 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Image, Dimensions, ScrollView} from 'react-native';
 import {Carousel, PlaceModalDetailText} from '../components';
-import {Text, Button, Layout} from '@ui-kitten/components';
+import {Text, Button, Layout, ListItem} from '@ui-kitten/components';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getMapDetailInfo, addPlace} from '../api';
 import moment from 'moment';
 import useStore from '../stores';
 import {PLACE_STATUS} from '../config/constants';
-import {getSidoAndSigungu, isEmpty, isEmptyArray} from '../utils';
+import {
+  getSidoAndSigungu,
+  isEmpty,
+  isEmptyArray,
+  Category,
+  Title,
+} from '../utils';
 
 const toastConfig = {
   success: props => (
@@ -114,7 +120,6 @@ export const MapDetail = ({route: {params}}) => {
   useEffect(() => {
     async function fetchData() {
       const data = await getMapDetailInfo(id);
-      console.log(data.bizhourInfo);
       setItem(data);
     }
     fetchData();
@@ -144,7 +149,6 @@ export const MapDetail = ({route: {params}}) => {
     <Layout style={{flex: 1}}>
       <ScrollView>
         <Layout style={styles.container} level="1">
-          {/* <View> */}
           {item.imageURL && (
             <Carousel
               page={page}
@@ -155,13 +159,10 @@ export const MapDetail = ({route: {params}}) => {
               RenderItem={_renderItem}
             />
           )}
-          {item.categories !== undefined && item.categories.length === 2 && (
-            <Text style={styles.category}>{item.categories[1]}</Text>
-          )}
-
-          <Text category="h4" style={styles.title}>
-            {item.name}
-          </Text>
+          <ListItem
+            title={() => <Category value={item.category} />}
+            description={() => <Title value={item.name} />}
+          />
           {isEmpty(item.phone) && (
             <PlaceModalDetailText
               iconName="phone"
@@ -234,11 +235,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     minHeight: 250,
-  },
-  category: {
-    marginTop: 12,
-    color: '#aaa',
-    fontSize: 14,
   },
   title: {
     // color: 'black',

@@ -1,3 +1,6 @@
+import React from 'react';
+import {Text} from '@ui-kitten/components';
+
 const getSidoAndSigungu = (fullAddress, addressAbbr) => {
   const address = fullAddress.replace(addressAbbr, '');
   const splitAddress = address.split(' ');
@@ -17,6 +20,33 @@ const isEmpty = value => {
   return value !== undefined && value !== null && value !== '';
 };
 const isEmptyArray = value => {
-  return value !== undefined && value !== null && value.length !== 0;
+  return (
+    value !== 0 && value !== undefined && value !== null && value.length !== 0
+  );
 };
-export {getSidoAndSigungu, isEmpty, isEmptyArray};
+
+const Category = ({value}) => {
+  if (isEmpty(value)) {
+    return (
+      <Text
+        style={{
+          fontSize: 12,
+          color: '#aaa',
+        }}>
+        {value}
+      </Text>
+    );
+  } else {
+    return <Text></Text>;
+  }
+};
+
+const Title = ({value}) => {
+  if (isEmpty(value)) {
+    return <Text category="h4">{value}</Text>;
+  } else {
+    return <Text></Text>;
+  }
+};
+
+export {getSidoAndSigungu, isEmpty, isEmptyArray, Category, Title};

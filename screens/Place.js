@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, View, BackHandler, ToastAndroid} from 'react-native';
 import {
   Icon,
   Text,
@@ -16,7 +16,6 @@ import {PLACE_STATUS, VIEW_TYPE} from '../config/constants';
 import {useQuery} from 'react-query';
 import useStore from '../stores';
 import {PlaceModalDetail} from './PlaceModalDetail';
-import {MapInfo} from './MapInfo';
 
 const MenuIcon = props => <Icon {...props} name="more-vertical" />;
 const StarIcon = (color, name) => {
@@ -38,16 +37,46 @@ export const Place = observer(({navigation}) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [placeItem, setPlaceItem] = useState({});
   const [modalLoading, setModalLoading] = useState(true);
+  const [forceRefresh, setForceRefresh] = useState(false);
+  const [exitApp, setExitApp] = useState(0);
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
+  useEffect(() => {
+    const backAction = () => {
+      setTimeout(() => {
+        setExitApp(0);
+      }, 2000);
+
+      if (exitApp === 0) {
+        setExitApp(1);
+
+        console.log(exitApp);
+        ToastAndroid.show(
+          '한 번 더 누르시면 앱을 종료합니다.',
+          ToastAndroid.SHORT,
+        );
+      } else if (exitApp === 1) {
+        console.log('종료해랏');
+        BackHandler.exitApp();
+      }
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  });
 
   const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
     onSuccess: items => {
-      if (isFirst) {
+      if (isFirst || forceRefresh) {
         console.log('items all loading');
         setAllData(items);
         setIsFirst(false);
+        setForceRefresh(false);
       }
       console.log('getPlaces reload');
     },
@@ -207,6 +236,7 @@ export const Place = observer(({navigation}) => {
           data={data}
           navigation={navigation}
           callbackModal={callbackModal}
+          setForceRefresh={setForceRefresh}
           naviMapInfo={naviMapInfo}
         />
       ) : (

@@ -2,13 +2,7 @@ import React, {useEffect} from 'react';
 import Modal from 'react-native-modal';
 import {PlaceModalDetailText} from '../components';
 import {isEmpty} from '../utils';
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  BackHandler,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, View, Dimensions, ScrollView} from 'react-native';
 import {
   Icon,
   Text,
@@ -19,6 +13,7 @@ import {
 } from '@ui-kitten/components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {LoadingIndicator} from '../components';
+import {Category, Title} from '../utils';
 
 const deviceWidth = Dimensions.get('window').width;
 const closeIcon = props => <Icon {...props} name="close-outline" />;
@@ -28,7 +23,6 @@ export const PlaceModalDetail = ({
   isModalVisible,
   toggleModal,
   doUpdatePlaceStatus,
-  naviMapInfo,
 }) => {
   const {
     category,
@@ -46,24 +40,10 @@ export const PlaceModalDetail = ({
     memo,
   } = placeItem;
 
-  useEffect(() => {
-    const backAction = () => {
-      console.log('back');
-      // if (isModalVisible) {
-      //   setModalVisible(!isModalVisible);
-      // }
-    };
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => backHandler.remove();
-  }, []);
-
   return (
     <Modal
       style={styles.bottomModal}
+      onBackButtonPress={toggleModal}
       isVisible={isModalVisible}
       deviceWidth={deviceWidth}
       onBackdropPress={toggleModal}>
@@ -83,14 +63,8 @@ export const PlaceModalDetail = ({
             <ScrollView>
               <Layout style={styles.modalContentBody}>
                 <ListItem
-                  title={() =>
-                    category && (
-                      <Text style={styles.categoryText}>{category}</Text>
-                    )
-                  }
-                  description={() =>
-                    title && <Text category="h4">{title}</Text>
-                  }
+                  title={() => <Category value={category} />}
+                  description={() => <Title value={title} />}
                   accessoryRight={() => (
                     <Avatar
                       source={
@@ -122,6 +96,13 @@ export const PlaceModalDetail = ({
                     title={phone}
                   />
                 )}
+                {isEmpty(bizhourInfo) && (
+                  <PlaceModalDetailText
+                    iconName="clock-time-nine-outline"
+                    category="영업시간"
+                    title={bizhourInfo}
+                  />
+                )}
                 {isEmpty(options) && (
                   <PlaceModalDetailText
                     iconName="cube"
@@ -136,13 +117,6 @@ export const PlaceModalDetail = ({
                     title={keywords}
                   />
                 )}
-                {isEmpty(bizhourInfo) && (
-                  <PlaceModalDetailText
-                    iconName="clock-time-nine-outline"
-                    category="영업시간"
-                    title={bizhourInfo}
-                  />
-                )}
                 {isEmpty(description) && (
                   <PlaceModalDetailText
                     iconName="note-outline"
@@ -150,6 +124,11 @@ export const PlaceModalDetail = ({
                     title={description}
                   />
                 )}
+                <PlaceModalDetailText
+                  iconName="pencil-outline"
+                  category="메모"
+                  title={memo}
+                />
                 {isEmpty(regdate) && (
                   <PlaceModalDetailText
                     iconName="check"
@@ -157,14 +136,6 @@ export const PlaceModalDetail = ({
                     title={regdate}
                   />
                 )}
-                {/* 
-                {memo && (
-                  <PlaceModalDetailText
-                    iconName="clock-time-nine-outline"
-                    category="메모"
-                    title={memo}
-                  />
-                )} */}
               </Layout>
             </ScrollView>
             <View style={styles.modalContentFooter}>

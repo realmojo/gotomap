@@ -1,16 +1,14 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Text} from '@ui-kitten/components';
-
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const iconColor = '#dadbdd';
 const iconSize = 18;
 
-const TextDetail = ({iconName, text}) => {
+const TextDetail = ({iconName, text, doPress}) => {
   return (
-    <View style={styles.textWrap}>
+    <TouchableOpacity style={styles.textWrap} onPress={doPress}>
       <MaterialCommunityIcons
         style={styles.icon}
         name={iconName}
@@ -18,7 +16,7 @@ const TextDetail = ({iconName, text}) => {
         size={iconSize}
       />
       <Text style={styles.text}>{text}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -27,15 +25,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingBottom: 10,
     paddingTop: 10,
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#dadbdd',
   },
   icon: {
     marginRight: 4,
   },
   text: {
-    paddingRight: 20,
-    color: 'black',
+    fontSize: 13,
   },
 });
 

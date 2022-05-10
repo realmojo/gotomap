@@ -91,10 +91,7 @@ export const Map = ({navigation}) => {
       </Layout>
       <NaverMapView
         style={styles.maps}
-        // showsMyLocationButton={true}
         center={{...coordinate, zoom: 14}}
-        // onTouch={e => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-        // onCameraChange={e => console.warn('onCameraChange', JSON.stringify(e))}
         onMapClick={e => console.warn('onMapClick', JSON.stringify(e))}>
         <Marker
           coordinate={coordinate}
