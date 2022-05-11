@@ -3,7 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import {BottomTab, Detail, MapDetail, Login, MapInfo} from './screens';
+import {BottomTab, MapDetail, Login, MapInfo} from './screens';
 import {
   createStackNavigator,
   CardStyleInterpolators,
@@ -28,14 +28,6 @@ const TotalStack = observer(() => {
             component={BottomTab}
             options={{
               headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="detail"
-            component={Detail}
-            options={{
-              title: 'Custom animation',
-              cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
             }}
           />
           <Stack.Screen

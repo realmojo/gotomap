@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, BackHandler, ToastAndroid} from 'react-native';
 import {
   Icon,
@@ -9,6 +9,7 @@ import {
   TopNavigation,
   TopNavigationAction,
 } from '@ui-kitten/components';
+import {useFocusEffect} from '@react-navigation/native';
 import {getPlaces, getPlace, updatePlaceStatus} from '../api';
 import {observer} from 'mobx-react';
 import {PlaceList, PlaceMap, LoadingIndicator, Error} from '../components';
@@ -38,37 +39,36 @@ export const Place = observer(({navigation}) => {
   const [placeItem, setPlaceItem] = useState({});
   const [modalLoading, setModalLoading] = useState(true);
   const [forceRefresh, setForceRefresh] = useState(false);
-  const [exitApp, setExitApp] = useState(0);
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-  useEffect(() => {
-    const backAction = () => {
-      setTimeout(() => {
-        setExitApp(0);
-      }, 2000);
+  const [exitApp, setExitApp] = useState(0);
 
-      if (exitApp === 0) {
-        setExitApp(1);
-
-        console.log(exitApp);
-        ToastAndroid.show(
-          '한 번 더 누르시면 앱을 종료합니다.',
-          ToastAndroid.SHORT,
-        );
-      } else if (exitApp === 1) {
-        console.log('종료해랏');
-        BackHandler.exitApp();
-      }
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => backHandler.remove();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      const backAction = () => {
+        setTimeout(() => {
+          setExitApp(0);
+        }, 2000);
+        if (exitApp === 0) {
+          setExitApp(1);
+          ToastAndroid.show(
+            '한 번 더 누르시면 앱을 종료합니다.',
+            ToastAndroid.SHORT,
+          );
+        } else if (exitApp === 1) {
+          console.log('종료해랏');
+          BackHandler.exitApp();
+        }
+        return true;
+      };
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+      return () => backHandler.remove();
+    }),
+  );
 
   const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
     onSuccess: items => {

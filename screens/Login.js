@@ -44,12 +44,8 @@ export const Login = () => {
         </Text>
       </View>
       <View style={styles.buttonWrap}>
-        <Button
-          style={styles.button}
-          onPress={() => doLogin()}
-          status="basic"
-          accessoryRight={isKakaoLoading ? LoadingIndicator : ''}>
-          카카오로 로그인
+        <Button style={styles.button} onPress={() => doLogin()} status="basic">
+          {isKakaoLoading ? <LoadingIndicator /> : '카카오로 로그인'}
         </Button>
       </View>
     </Layout>

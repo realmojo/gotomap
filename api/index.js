@@ -1,4 +1,4 @@
-export const API_URL = 'https://rich-women-divide-116-38-134-229.loca.lt';
+export const API_URL = 'https://gotomap-server.herokuapp.com';
 export * from './Login';
 export * from './Map';
 export * from './KakaoLogin';
