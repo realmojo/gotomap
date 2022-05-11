@@ -19,7 +19,7 @@ const defaultSigungu = {
 
 const PlaceList = ({
   allData,
-  data,
+  data = [],
   navigation,
   callbackModal,
   naviMapInfo,
