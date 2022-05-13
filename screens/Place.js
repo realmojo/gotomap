@@ -37,7 +37,6 @@ export const Place = observer(({navigation}) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [placeItem, setPlaceItem] = useState({});
-  const [modalLoading, setModalLoading] = useState(true);
   const [forceRefresh, setForceRefresh] = useState(false);
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -164,12 +163,10 @@ export const Place = observer(({navigation}) => {
     </View>
   );
 
-  const callbackModal = async id => {
-    setModalLoading(true);
+  const callbackModal = item => {
     setModalVisible(!isModalVisible);
-    const item = await getPlace(id);
+    // const item = await getPlace(id);
     setPlaceItem(item);
-    setModalLoading(false);
   };
 
   const naviMapInfo = coordinate => {
@@ -226,7 +223,6 @@ export const Place = observer(({navigation}) => {
       <PlaceModalDetail
         placeItem={placeItem}
         isModalVisible={isModalVisible}
-        modalLoading={modalLoading}
         toggleModal={toggleModal}
         doUpdatePlaceStatus={doUpdatePlaceStatus}
       />

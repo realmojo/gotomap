@@ -12,14 +12,12 @@ import {
   Avatar,
 } from '@ui-kitten/components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
-import {LoadingIndicator} from '../components';
 import {Category, Title} from '../utils';
 
 const deviceWidth = Dimensions.get('window').width;
 const closeIcon = props => <Icon {...props} name="close-outline" />;
 export const PlaceModalDetail = ({
   placeItem,
-  modalLoading,
   isModalVisible,
   toggleModal,
   doUpdatePlaceStatus,
@@ -56,105 +54,101 @@ export const PlaceModalDetail = ({
         />
       </View>
       <View style={styles.modalContent}>
-        {modalLoading ? (
-          <LoadingIndicator />
-        ) : (
-          <View style={{flex: 1}}>
-            <ScrollView>
-              <Layout style={styles.modalContentBody}>
-                <ListItem
-                  title={() => <Category value={category} />}
-                  description={() => <Title value={title} />}
-                  accessoryRight={() => (
-                    <Avatar
-                      source={
-                        imageURL
-                          ? {uri: imageURL}
-                          : require('../assets/images/logo.png')
-                      }
-                    />
-                  )}
-                />
-                {isEmpty(fullAddress) && (
-                  <PlaceModalDetailText
-                    iconName="map-marker"
-                    category="지번 주소"
-                    title={fullAddress}
+        <View style={{flex: 1}}>
+          <ScrollView>
+            <Layout style={styles.modalContentBody}>
+              <ListItem
+                title={() => <Category value={category} />}
+                description={() => <Title value={title} />}
+                accessoryRight={() => (
+                  <Avatar
+                    source={
+                      imageURL
+                        ? {uri: imageURL}
+                        : require('../assets/images/logo.png')
+                    }
                   />
                 )}
-                {isEmpty(fullRoadAddress) && (
-                  <PlaceModalDetailText
-                    iconName="map-marker"
-                    category="도로명 주소"
-                    title={fullRoadAddress}
-                  />
-                )}
-                {isEmpty(phone) && (
-                  <PlaceModalDetailText
-                    iconName="phone"
-                    category="연락처"
-                    title={phone}
-                  />
-                )}
-                {isEmpty(bizhourInfo) && (
-                  <PlaceModalDetailText
-                    iconName="clock-time-nine-outline"
-                    category="영업시간"
-                    title={bizhourInfo}
-                  />
-                )}
-                {isEmpty(options) && (
-                  <PlaceModalDetailText
-                    iconName="cube"
-                    category="옵션"
-                    title={options}
-                  />
-                )}
-                {isEmpty(keywords) && (
-                  <PlaceModalDetailText
-                    iconName="key"
-                    category="키워드"
-                    title={keywords}
-                  />
-                )}
-                {isEmpty(description) && (
-                  <PlaceModalDetailText
-                    iconName="note-outline"
-                    category="설명"
-                    title={description}
-                  />
-                )}
+              />
+              {isEmpty(fullAddress) && (
                 <PlaceModalDetailText
-                  iconName="pencil-outline"
-                  category="메모"
-                  title={memo}
+                  iconName="map-marker"
+                  category="지번 주소"
+                  title={fullAddress}
                 />
-                {isEmpty(regdate) && (
-                  <PlaceModalDetailText
-                    iconName="check"
-                    category="등록날짜"
-                    title={regdate}
-                  />
-                )}
-              </Layout>
-            </ScrollView>
-            <View style={styles.modalContentFooter}>
-              <Button
-                size="giant"
-                appearance={
-                  status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
-                }
-                onPress={() => doUpdatePlaceStatus(placeItem)}
-                status="warning">
-                <Text>
-                  {status === PLACE_STATUS.BACKLOG
-                    ? PLACE_STATUS_KR.BACKLOG
-                    : PLACE_STATUS_KR.DONE}
-                </Text>
-              </Button>
-            </View>
+              )}
+              {isEmpty(fullRoadAddress) && (
+                <PlaceModalDetailText
+                  iconName="map-marker"
+                  category="도로명 주소"
+                  title={fullRoadAddress}
+                />
+              )}
+              {isEmpty(phone) && (
+                <PlaceModalDetailText
+                  iconName="phone"
+                  category="연락처"
+                  title={phone}
+                />
+              )}
+              {isEmpty(bizhourInfo) && (
+                <PlaceModalDetailText
+                  iconName="clock-time-nine-outline"
+                  category="영업시간"
+                  title={bizhourInfo}
+                />
+              )}
+              {isEmpty(options) && (
+                <PlaceModalDetailText
+                  iconName="cube"
+                  category="옵션"
+                  title={options}
+                />
+              )}
+              {isEmpty(keywords) && (
+                <PlaceModalDetailText
+                  iconName="key"
+                  category="키워드"
+                  title={keywords}
+                />
+              )}
+              {isEmpty(description) && (
+                <PlaceModalDetailText
+                  iconName="note-outline"
+                  category="설명"
+                  title={description}
+                />
+              )}
+              <PlaceModalDetailText
+                iconName="pencil-outline"
+                category="메모"
+                title={memo}
+              />
+              {isEmpty(regdate) && (
+                <PlaceModalDetailText
+                  iconName="check"
+                  category="등록날짜"
+                  title={regdate}
+                />
+              )}
+            </Layout>
+          </ScrollView>
+          <View style={styles.modalContentFooter}>
+            <Button
+              size="giant"
+              appearance={
+                status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
+              }
+              onPress={() => doUpdatePlaceStatus(placeItem)}
+              status="warning">
+              <Text>
+                {status === PLACE_STATUS.BACKLOG
+                  ? PLACE_STATUS_KR.BACKLOG
+                  : PLACE_STATUS_KR.DONE}
+              </Text>
+            </Button>
           </View>
-        )}
+        </View>
       </View>
     </Modal>
   );

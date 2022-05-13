@@ -112,13 +112,13 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   });
 
   const renderItemHeader = item => {
-    const {_id, title, category, imageURL, status, memo} = item;
+    const {_id, title, category, imageURL, status} = item;
     return (
       <ListItem
         title={title}
         description={category}
         onPress={() => {
-          callbackModal(_id);
+          callbackModal(item);
         }}
         onLongPress={() => {
           doDelete(title, _id);
@@ -194,13 +194,13 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
                 onBlur={() => doSave(item.item._id)}
                 onChangeText={nextValue => setValue(nextValue)}
               />
-              {/* <Button
+              <Button
                 style={{marginHorizontal: 10}}
                 size="small"
                 status="warning"
                 onPress={() => doSave(item.item._id)}>
                 저장
-              </Button> */}
+              </Button>
             </>
           ) : memo ? (
             <TextDetail

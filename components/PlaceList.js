@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useMemo} from 'react';
 import {StyleSheet, View, RefreshControl, ScrollView} from 'react-native';
 import {
   List,
@@ -34,7 +34,7 @@ const PlaceList = ({
     new IndexPath(0),
   );
   const [sigunguOptions, setSigunguOptions] = useState([]);
-
+  console.log('Place list');
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
@@ -93,54 +93,57 @@ const PlaceList = ({
     filterListData(sigunguOptions[index.row], 'sigungu');
   };
 
-  return (
-    <View style={{marginBottom: 210}}>
-      <Layout style={styles.layoutContainer} level="2">
-        <Select
-          style={styles.select}
-          value={selectedSido.name_kr}
-          selectedIndex={selectedSidoIndex}
-          onSelect={index => doSidoSelect(index)}>
-          {SIDO.map((item, index) => (
-            <SelectItem key={index} title={item.name_kr} />
-          ))}
-        </Select>
-        <Select
-          style={styles.select}
-          value={selectedSigungu.name_kr}
-          selectedIndex={selectedSigunguIndex}
-          onSelect={index => doSigunguSelect(index)}>
-          {selectedSido !== 'All' &&
-            sigunguOptions.map((item, index) => (
+  return useMemo(
+    () => (
+      <View style={{marginBottom: 210}}>
+        <Layout style={styles.layoutContainer} level="2">
+          <Select
+            style={styles.select}
+            value={selectedSido.name_kr}
+            selectedIndex={selectedSidoIndex}
+            onSelect={index => doSidoSelect(index)}>
+            {SIDO.map((item, index) => (
               <SelectItem key={index} title={item.name_kr} />
             ))}
-        </Select>
-      </Layout>
-      {data !== null && data.length !== 0 ? (
-        <List
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-          data={data}
-          renderItem={item => (
-            <PlaceListItem
-              item={item}
-              callbackModal={callbackModal}
-              naviMapInfo={naviMapInfo}
-            />
-          )}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-      ) : (
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          <Nothing navigation={navigation} />
-        </ScrollView>
-      )}
-    </View>
+          </Select>
+          <Select
+            style={styles.select}
+            value={selectedSigungu.name_kr}
+            selectedIndex={selectedSigunguIndex}
+            onSelect={index => doSigunguSelect(index)}>
+            {selectedSido !== 'All' &&
+              sigunguOptions.map((item, index) => (
+                <SelectItem key={index} title={item.name_kr} />
+              ))}
+          </Select>
+        </Layout>
+        {data !== null && data.length !== 0 ? (
+          <List
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+            data={data}
+            renderItem={item => (
+              <PlaceListItem
+                item={item}
+                callbackModal={callbackModal}
+                naviMapInfo={naviMapInfo}
+              />
+            )}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        ) : (
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
+            <Nothing navigation={navigation} />
+          </ScrollView>
+        )}
+      </View>
+    ),
+    [data, refreshing],
   );
 };
 const styles = StyleSheet.create({
