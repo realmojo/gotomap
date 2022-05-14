@@ -1,5 +1,5 @@
 import React from 'react';
-import {Linking} from 'react-native';
+import {StyleSheet, Linking} from 'react-native';
 import {ListItem, Text} from '@ui-kitten/components';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -17,10 +17,11 @@ const PhontText = ({title}) => (
     {title}
   </Text>
 );
-export const PlaceModalDetailText = ({iconName, category, title}) => {
+
+export const PlaceModalDetailText = ({iconName, category, title, doPress}) => {
   return (
     <ListItem
-      // onPress={() => doUpdatePlaceMemo(title)}
+      onPress={doPress ? doPress : null}
       title={() => (
         <Text style={{fontSize: 12, marginLeft: 10, color: '#aaa'}}>
           {category}
@@ -30,7 +31,9 @@ export const PlaceModalDetailText = ({iconName, category, title}) => {
         iconName === 'phone' ? (
           <PhontText title={title} />
         ) : (
-          <Text style={{fontSize: 13, marginLeft: 10}}>{title}</Text>
+          <Text style={[styles.text, title === '' ? styles.color : '']}>
+            {title ? title : '간단한 메모를 작성하세요.'}
+          </Text>
         )
       }
       accessoryLeft={() => (
@@ -43,3 +46,13 @@ export const PlaceModalDetailText = ({iconName, category, title}) => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 13,
+    marginLeft: 10,
+  },
+  color: {
+    color: '#ddd',
+  },
+});

@@ -8,12 +8,14 @@ import {getMapDetailInfo, addPlace} from '../api';
 import moment from 'moment';
 import useStore from '../stores';
 import {PLACE_STATUS} from '../config/constants';
+import {LoadingIndicator} from '../components';
 import {
   getSidoAndSigungu,
   isEmpty,
   isEmptyArray,
   Category,
   Title,
+  optionText,
 } from '../utils';
 
 const toastConfig = {
@@ -38,12 +40,6 @@ const toastConfig = {
         fontSize: 15,
       }}
     />
-  ),
-  tomatoToast: ({text1, props}) => (
-    <View style={{height: 60, width: '100%', backgroundColor: 'tomato'}}>
-      <Text>{text1}</Text>
-      <Text>{props.uuid}</Text>
-    </View>
   ),
 };
 
@@ -106,17 +102,6 @@ export const MapDetail = ({route: {params}}) => {
     }
   };
 
-  const optionText = items => {
-    if (isEmpty(items)) {
-      const t = [];
-      for (const item of items) {
-        t.push(item.name);
-      }
-      return t.join('/');
-    }
-    return '앗! 옵션 정보가 없네요';
-  };
-
   useEffect(() => {
     async function fetchData() {
       const data = await getMapDetailInfo(id);
@@ -135,6 +120,7 @@ export const MapDetail = ({route: {params}}) => {
       />
     </View>
   );
+
   // Toast 메세지 출력
   const showToast = () => {
     Toast.show({
@@ -147,78 +133,80 @@ export const MapDetail = ({route: {params}}) => {
 
   return (
     <Layout style={{flex: 1}}>
-      <ScrollView>
-        <Layout style={styles.container} level="1">
-          {item.imageURL && (
-            <Carousel
-              page={page}
-              setPage={setPage}
-              gap={0}
-              data={item.images}
-              pageWidth={Dimensions.get('screen').width}
-              RenderItem={_renderItem}
-            />
-          )}
-          <ListItem
-            title={() => <Category value={item.category} />}
-            description={() => <Title value={item.name} />}
-          />
-          {isEmpty(item.phone) && (
-            <PlaceModalDetailText
-              iconName="phone"
-              category="연락처"
-              title={item.phone}
-            />
-          )}
-          {isEmpty(item.fullRoadAddress) && (
-            <PlaceModalDetailText
-              iconName="map-marker"
-              category="도로명주소"
-              title={item.fullRoadAddress}
-            />
-          )}
+      {!item.name ? (
+        <LoadingIndicator />
+      ) : (
+        <>
+          <ScrollView>
+            <Layout style={styles.container} level="1">
+              {item.imageURL && (
+                <Carousel
+                  page={page}
+                  setPage={setPage}
+                  gap={0}
+                  data={item.images}
+                  pageWidth={Dimensions.get('screen').width}
+                  RenderItem={_renderItem}
+                />
+              )}
+              <ListItem
+                title={() => <Category value={item.category} />}
+                description={() => <Title value={item.name} />}
+              />
+              {isEmpty(item.phone) && (
+                <PlaceModalDetailText
+                  iconName="phone"
+                  category="연락처"
+                  title={item.phone}
+                />
+              )}
+              {isEmpty(item.fullRoadAddress) && (
+                <PlaceModalDetailText
+                  iconName="map-marker"
+                  category="도로명주소"
+                  title={item.fullRoadAddress}
+                />
+              )}
 
-          {isEmptyArray(item.options) && (
-            <PlaceModalDetailText
-              iconName="cube"
-              category="옵션"
-              title={optionText(item.options)}
-            />
-          )}
-          {isEmptyArray(item.keywords) && (
-            <PlaceModalDetailText
-              iconName="key"
-              category="키워드"
-              title={item.keywords.join('/')}
-            />
-          )}
-          {isEmpty(item.bizhourInfo) && (
-            <PlaceModalDetailText
-              iconName="clock-time-nine-outline"
-              category="영업시간"
-              title={item.bizhourInfo}
-            />
-          )}
-          {isEmpty(item.description) && (
-            <PlaceModalDetailText
-              iconName="note-outline"
-              category="설명"
-              title={item.description}
-            />
-          )}
-        </Layout>
-      </ScrollView>
-      <Toast config={toastConfig} />
-      <View>
-        <Button
-          style={styles.button}
-          status="warning"
-          size="large"
-          onPress={() => doGo()}>
-          <Text style={styles.goText}>가봐야지 </Text>
-          {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
-        </Button>
-      </View>
+              {isEmptyArray(item.options) && (
+                <PlaceModalDetailText
+                  iconName="cube"
+                  category="옵션"
+                  title={optionText(item.options)}
+                />
+              )}
+              {isEmptyArray(item.keywords) && (
+                <PlaceModalDetailText
+                  iconName="key"
+                  category="키워드"
+                  title={item.keywords.join('/')}
+                />
+              )}
+              {isEmpty(item.bizhourInfo) && (
+                <PlaceModalDetailText
+                  iconName="clock-time-nine-outline"
+                  category="영업시간"
+                  title={item.bizhourInfo}
+                />
+              )}
+              {isEmpty(item.description) && (
+                <PlaceModalDetailText
+                  iconName="note-outline"
+                  category="설명"
+                  title={item.description}
+                />
+              )}
+            </Layout>
+          </ScrollView>
+          <Toast config={toastConfig} />
+          <View>
+            <Button status="warning" size="large" onPress={() => doGo()}>
+              <Text style={styles.goText}>등록 </Text>
+              {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
+            </Button>
+          </View>
+        </>
+      )}
     </Layout>
   );
 };

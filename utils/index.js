@@ -49,4 +49,15 @@ const Title = ({value}) => {
   }
 };
 
-export {getSidoAndSigungu, isEmpty, isEmptyArray, Category, Title};
+const optionText = items => {
+  if (isEmpty(items)) {
+    const t = [];
+    for (const item of items) {
+      t.push(item.name);
+    }
+    return t.join('/');
+  }
+  return '앗! 옵션 정보가 없네요';
+};
+
+export {getSidoAndSigungu, isEmpty, isEmptyArray, Category, Title, optionText};

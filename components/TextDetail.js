@@ -15,7 +15,9 @@ const TextDetail = ({iconName, text, doPress}) => {
         color={iconColor}
         size={iconSize}
       />
-      <Text style={styles.text}>{text}</Text>
+      <Text style={[styles.text, text === '' ? styles.color : '']}>
+        {text ? text : '간단한 메모를 작성하세요'}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -31,6 +33,9 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
+  },
+  color: {
+    color: '#ddd',
   },
 });
 

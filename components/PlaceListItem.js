@@ -17,8 +17,10 @@ import {useQueryClient, useMutation} from 'react-query';
 const editIcon = props => <Icon {...props} name="edit-outline" />;
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
-  const {fullAddress, latitude, longitude, memo} = item.item;
   const queryClient = useQueryClient();
+  const {fullAddress, latitude, longitude, memo} = item.item;
+  const [isMemoInput, setIsMemoInput] = useState(false);
+  const [value, setValue] = useState('');
 
   const doDelete = (title, _id) => {
     Alert.alert(
@@ -43,9 +45,6 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   const doPress = () => {
     naviMapInfo({latitude, longitude});
   };
-
-  const [isMemoInput, setIsMemoInput] = useState(false);
-  const [value, setValue] = useState('');
 
   const doSave = _id => {
     setIsMemoInput(false);
@@ -202,13 +201,13 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
                 저장
               </Button>
             </>
-          ) : memo ? (
+          ) : (
             <TextDetail
               iconName="pencil-outline"
-              text={memo}
-              // doPress={() => setIsMemoInput(true)}
+              text={memo ? memo : ''}
+              doPress={() => setIsMemoInput(true)}
             />
-          ) : null}
+          )}
         </Card>
       </View>
     ),

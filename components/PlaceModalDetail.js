@@ -1,28 +1,28 @@
-import React, {useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import Modal from 'react-native-modal';
-import {PlaceModalDetailText} from '../components';
+import {PlaceModalDetailText} from './';
 import {isEmpty} from '../utils';
+import {updatePlaceStatus, updatePlaceMemo} from '../api';
 import {StyleSheet, View, Dimensions, ScrollView} from 'react-native';
 import {
   Icon,
   Text,
-  Layout,
-  Button,
-  ListItem,
+  Input,
   Avatar,
+  Button,
+  Layout,
+  ListItem,
 } from '@ui-kitten/components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
+import {useQueryClient, useMutation} from 'react-query';
 import {Category, Title} from '../utils';
 
 const deviceWidth = Dimensions.get('window').width;
 const closeIcon = props => <Icon {...props} name="close-outline" />;
-export const PlaceModalDetail = ({
-  placeItem,
-  isModalVisible,
-  toggleModal,
-  doUpdatePlaceStatus,
-}) => {
+export const PlaceModalDetail = ({placeItem, isModalVisible, toggleModal}) => {
+  const queryClient = useQueryClient();
   const {
+    _id,
     category,
     title,
     imageURL,
@@ -37,6 +37,59 @@ export const PlaceModalDetail = ({
     status,
     memo,
   } = placeItem;
+
+  const [isMemoInput, setIsMemoInput] = useState(false);
+  const [value, setValue] = useState('');
+  const [stateMemo, setStateMemo] = useState(memo);
+
+  const doSave = _id => {
+    setIsMemoInput(false);
+    doUpdatePlaceMemo({_id, memo: value});
+  };
+
+  const doUpdatePlaceMemo = useCallback(
+    params => {
+      updateMutationMemo.mutate(params);
+    },
+    [updateMutationMemo],
+  );
+
+  const doUpdatePlaceStatus = useCallback(
+    params => {
+      updateMutationStatus.mutate(params);
+    },
+    [updateMutationStatus],
+  );
+
+  const updateMutationMemo = useMutation(params => updatePlaceMemo(params), {
+    onMutate: item => {
+      const previousValue = queryClient.setQueryData('getPlaces', places => {
+        const findIndex = places.findIndex(place => {
+          return place._id === item._id;
+        });
+        places[findIndex].memo = item.memo;
+        setStateMemo(item.memo);
+        return places;
+      });
+      return previousValue;
+    },
+  });
+
+  const updateMutationStatus = useMutation(
+    params => updatePlaceStatus(params),
+    {
+      onMutate: item => {
+        const previousValue = queryClient.setQueryData('getPlaces', places => {
+          const findIndex = places.findIndex(place => {
+            return place._id === item._id;
+          });
+          places[findIndex].status = item.status;
+          return places;
+        });
+        return previousValue;
+      },
+    },
+  );
 
   return (
     <Modal
@@ -119,11 +172,38 @@ export const PlaceModalDetail = ({
                   title={description}
                 />
               )}
-              <PlaceModalDetailText
-                iconName="pencil-outline"
-                category="메모"
-                title={memo}
-              />
+              {isMemoInput ? (
+                <>
+                  <Input
+                    style={{padding: 10}}
+                    placeholder="입력하고 싶은 내용을 적어주세요"
+                    size="medium"
+                    status="warning"
+                    multiline={true}
+                    textStyle={{minHeight: 64}}
+                    value={value}
+                    onBlur={() => doSave(_id)}
+                    onChangeText={nextValue => setValue(nextValue)}
+                  />
+                  <Button
+                    style={{marginHorizontal: 10}}
+                    size="small"
+                    status="warning"
+                    onPress={() => doSave(_id)}>
+                    저장
+                  </Button>
+                </>
+              ) : (
+                <PlaceModalDetailText
+                  iconName="pencil-outline"
+                  category="메모"
+                  title={stateMemo ? stateMemo : ''}
+                  doPress={() => {
+                    setIsMemoInput(true);
+                    setValue(stateMemo);
+                  }}
+                />
+              )}
               {isEmpty(regdate) && (
                 <PlaceModalDetailText
                   iconName="check"
@@ -139,7 +219,15 @@ export const PlaceModalDetail = ({
               appearance={
                 status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
               }
-              onPress={() => doUpdatePlaceStatus(placeItem)}
+              onPress={() =>
+                doUpdatePlaceStatus({
+                  _id,
+                  status:
+                    status === PLACE_STATUS.BACKLOG
+                      ? PLACE_STATUS.DONE
+                      : PLACE_STATUS.BACKLOG,
+                })
+              }
               status="warning">
               <Text>
                 {status === PLACE_STATUS.BACKLOG

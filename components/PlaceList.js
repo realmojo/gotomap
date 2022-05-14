@@ -11,6 +11,7 @@ import {SIDO, SIGUNGU} from '../config/constants';
 import {useQueryClient} from 'react-query';
 import {PlaceListItem} from './index';
 import {Nothing} from './Nothing';
+import {PlaceModalDetail} from '../components';
 
 const defaultSigungu = {
   name_en: 'All',
@@ -26,6 +27,8 @@ const PlaceList = ({
   setForceRefresh,
 }) => {
   const queryClient = useQueryClient();
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [placeItem, setPlaceItem] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
   const [selectedSigungu, setSelectedSigungu] = useState(defaultSigungu);
@@ -37,6 +40,15 @@ const PlaceList = ({
   console.log('Place list');
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
+  };
+
+  const openModal = item => {
+    setModalVisible(!isModalVisible);
+    setPlaceItem(item);
+  };
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
   const onRefresh = useCallback(() => {
@@ -96,6 +108,11 @@ const PlaceList = ({
   return useMemo(
     () => (
       <View style={{marginBottom: 210}}>
+        <PlaceModalDetail
+          placeItem={placeItem}
+          isModalVisible={isModalVisible}
+          toggleModal={toggleModal}
+        />
         <Layout style={styles.layoutContainer} level="2">
           <Select
             style={styles.select}
@@ -125,7 +142,7 @@ const PlaceList = ({
             renderItem={item => (
               <PlaceListItem
                 item={item}
-                callbackModal={callbackModal}
+                callbackModal={openModal}
                 naviMapInfo={naviMapInfo}
               />
             )}
@@ -143,7 +160,7 @@ const PlaceList = ({
         )}
       </View>
     ),
-    [data, refreshing],
+    [data, refreshing, isModalVisible],
   );
 };
 const styles = StyleSheet.create({

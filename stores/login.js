@@ -20,9 +20,6 @@ const loginStore = observable({
       } catch (e) {
         console.log('user info error');
         console.log(e);
-        // runInAction(() => {
-        //   this.isLogin = false;
-        // });
       }
     }
   },
