@@ -5,3 +5,4 @@ export * from './My';
 export * from './MapDetail';
 export * from './MapInfo';
 export * from './Login';
+export * from './Test';

@@ -16,8 +16,8 @@ const placeStore = observable({
       if (viewType) {
         this.viewType = viewType;
       } else {
-        this.viewType = VIEW_TYPE.MAP;
-        this.setViewType(VIEW_TYPE.MAP);
+        this.viewType = VIEW_TYPE.LIST;
+        this.setViewType(VIEW_TYPE.LIST);
       }
     });
   },

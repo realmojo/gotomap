@@ -9,18 +9,21 @@ import {
   Button,
   ListItem,
 } from '@ui-kitten/components';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {TextDetail} from './index';
 import {updatePlaceStatus, updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
-const editIcon = props => <Icon {...props} name="edit-outline" />;
+const removeIcon = props => <Icon {...props} name="trash-2-outline" />;
+const checkIcon = props => <Icon {...props} name="check-circle" />;
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   const queryClient = useQueryClient();
   const {fullAddress, latitude, longitude, memo} = item.item;
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
+  const [stateMemo, setStateMemo] = useState('');
 
   const doDelete = (title, _id) => {
     Alert.alert(
@@ -114,7 +117,22 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
     const {_id, title, category, imageURL, status} = item;
     return (
       <ListItem
-        title={title}
+        title={() => (
+          <View style={{flexDirection: 'row'}}>
+            <Text style={{paddingLeft: 8}} category="p2">
+              {title}
+            </Text>
+            {status === PLACE_STATUS.DONE && (
+              <MaterialCommunityIcons
+                style={{paddingLeft: 4, paddingTop: 1}}
+                name="check-circle"
+                color="#ffaa00"
+                size={16}
+              />
+            )}
+          </View>
+        )}
+        // title={title}
         description={category}
         onPress={() => {
           callbackModal(item);
@@ -132,14 +150,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
         )}
         accessoryRight={() => (
           <>
-            <Button
-              size="small"
-              appearance="ghost"
-              status="warning"
-              accessoryLeft={editIcon}
-              onPress={() => setIsMemoInput(!isMemoInput)}
-            />
-            <Button
+            {/* <Button
               style={{marginRight: 10}}
               size="tiny"
               appearance={
@@ -160,7 +171,14 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
                   ? PLACE_STATUS_KR.BACKLOG
                   : PLACE_STATUS_KR.DONE}
               </Text>
-            </Button>
+            </Button> */}
+            <Button
+              size="small"
+              appearance="ghost"
+              status="basic"
+              accessoryLeft={removeIcon}
+              onPress={() => doDelete(title, _id)}
+            />
           </>
         )}
       />
@@ -205,7 +223,10 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
             <TextDetail
               iconName="pencil-outline"
               text={memo ? memo : ''}
-              doPress={() => setIsMemoInput(true)}
+              doPress={() => {
+                setIsMemoInput(true);
+                setValue(memo);
+              }}
             />
           )}
         </Card>

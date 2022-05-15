@@ -22,11 +22,11 @@ const PlaceList = ({
   allData,
   data = [],
   navigation,
-  callbackModal,
   naviMapInfo,
   setForceRefresh,
 }) => {
   const queryClient = useQueryClient();
+  // console.log(data[0].memo);
   const [isModalVisible, setModalVisible] = useState(false);
   const [placeItem, setPlaceItem] = useState({});
   const [refreshing, setRefreshing] = useState(false);
@@ -120,7 +120,7 @@ const PlaceList = ({
             selectedIndex={selectedSidoIndex}
             onSelect={index => doSidoSelect(index)}>
             {SIDO.map((item, index) => (
-              <SelectItem key={index} title={item.name_kr} />
+              <SelectItem key={index} title={`${item.name_kr}`} />
             ))}
           </Select>
           <Select

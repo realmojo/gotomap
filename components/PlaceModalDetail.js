@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import Modal from 'react-native-modal';
 import {PlaceModalDetailText} from './';
 import {isEmpty} from '../utils';
@@ -40,7 +40,11 @@ export const PlaceModalDetail = ({placeItem, isModalVisible, toggleModal}) => {
 
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
-  const [stateMemo, setStateMemo] = useState(memo);
+  const [stateMemo, setStateMemo] = useState('');
+
+  useEffect(() => {
+    setStateMemo(memo);
+  });
 
   const doSave = _id => {
     setIsMemoInput(false);
@@ -213,29 +217,31 @@ export const PlaceModalDetail = ({placeItem, isModalVisible, toggleModal}) => {
               )}
             </Layout>
           </ScrollView>
-          <View style={styles.modalContentFooter}>
-            <Button
-              size="giant"
-              appearance={
-                status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
-              }
-              onPress={() =>
-                doUpdatePlaceStatus({
-                  _id,
-                  status:
-                    status === PLACE_STATUS.BACKLOG
-                      ? PLACE_STATUS.DONE
-                      : PLACE_STATUS.BACKLOG,
-                })
-              }
-              status="warning">
-              <Text>
-                {status === PLACE_STATUS.BACKLOG
-                  ? PLACE_STATUS_KR.BACKLOG
-                  : PLACE_STATUS_KR.DONE}
-              </Text>
-            </Button>
-          </View>
+          {!isMemoInput && (
+            <View style={styles.modalContentFooter}>
+              <Button
+                size="giant"
+                appearance={
+                  status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
+                }
+                onPress={() =>
+                  doUpdatePlaceStatus({
+                    _id,
+                    status:
+                      status === PLACE_STATUS.BACKLOG
+                        ? PLACE_STATUS.DONE
+                        : PLACE_STATUS.BACKLOG,
+                  })
+                }
+                status="warning">
+                <Text>
+                  {status === PLACE_STATUS.BACKLOG
+                    ? PLACE_STATUS_KR.BACKLOG
+                    : PLACE_STATUS_KR.DONE}
+                </Text>
+              </Button>
+            </View>
+          )}
         </View>
       </View>
     </Modal>

@@ -3,8 +3,8 @@ import NaverMapView, {Marker} from 'react-native-nmap';
 import {
   View,
   Text,
-  Image,
   FlatList,
+  Animated,
   Dimensions,
   StyleSheet,
   ScrollView,
@@ -74,7 +74,7 @@ export const Map = ({navigation}) => {
   const [places, setPlaces] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
   const [historyWord, setHistoryWord] = useState([]);
-  const [isFocus, setIsFocus] = useState(false);
+  // const [isFocus, setIsFocus] = useState(false);
   const [coordinate, setCoordinate] = useState({
     latitude: 37.5632555012193,
     longitude: 126.97601589994,
@@ -138,43 +138,54 @@ export const Map = ({navigation}) => {
       text1: '등록완료',
       text2: '언젠간 꼭 가보기로 해요! 일정에서 확인해보세요 👏',
       position: 'bottom',
-      bottomOffset: 70,
+      bottomOffset: 0,
     });
   };
 
-  const doFocus = async () => {
-    const words = await getHistoryWords();
-    setHistoryWord(words);
-    setIsFocus(true);
-  };
+  // const doFocus = async () => {
+  //   const words = await getHistoryWords();
+  //   setHistoryWord(words);
+  //   setIsFocus(true);
+  // };
 
   const doClose = () => {
     setValue('');
-    setIsFocus(false);
+    // setIsFocus(false);
     setPlaces([]);
   };
 
-  const removeWord = async id => {
-    const words = await getHistoryWords();
-    const filterWords = words.filter(item => item.id !== id);
-    AsyncStorage.setItem('words', JSON.stringify(filterWords));
-    setHistoryWord(filterWords);
-  };
-
-  const _renderItem = ({item}) => (
-    <View style={styles.imageWrap}>
-      <Image
-        style={styles.image}
-        source={{
-          uri: item.url,
-        }}
-      />
-    </View>
-  );
+  // const removeWord = async id => {
+  //   const words = await getHistoryWords();
+  //   const filterWords = words.filter(item => item.id !== id);
+  //   AsyncStorage.setItem('words', JSON.stringify(filterWords));
+  //   setHistoryWord(filterWords);
+  // };
 
   // AsyncStorage.removeItem('words');
 
-  const placeClick = async (id, latitude, longitude, title, isWordClick) => {
+  // const wordRenderItem = item => {
+  //   const {id, title, latitude, longitude} = item.item;
+  //   if (id) {
+  //     return (
+  //       <ListItem
+  //         style={{height: 40}}
+  //         title={title}
+  //         onPress={() => placeClick(id, latitude, longitude, title, true)}
+  //         accessoryRight={() => (
+  //           <Button
+  //             status="basic"
+  //             size="small"
+  //             appearance="ghost"
+  //             onPress={() => removeWord(id)}
+  //             accessoryLeft={removeIcon}
+  //           />
+  //         )}
+  //       />
+  //     );
+  //   }
+  // };
+
+  const placeClick = async (id, latitude, longitude, title) => {
     setId(id);
     setCoordinate({
       latitude: Number(latitude),
@@ -183,39 +194,17 @@ export const Map = ({navigation}) => {
     setPlaces([]);
     const placeItem = await getMapDetailInfo(id);
     setSearchItem(placeItem);
-    if (!isWordClick) {
-      const words = await getHistoryWords();
-      words.push({
-        id,
-        title,
-        longitude,
-        latitude,
-      });
-      AsyncStorage.setItem('words', JSON.stringify(words));
-    }
+    // if (!isWordClick) {
+    //   const words = await getHistoryWords();
+    //   words.push({
+    //     id,
+    //     title,
+    //     longitude,
+    //     latitude,
+    //   });
+    //   AsyncStorage.setItem('words', JSON.stringify(words));
+    // }
     doClose();
-  };
-
-  const wordRenderItem = item => {
-    const {id, title, latitude, longitude} = item.item;
-    if (id) {
-      return (
-        <ListItem
-          style={{height: 40}}
-          title={title}
-          onPress={() => placeClick(id, latitude, longitude, title, true)}
-          accessoryRight={() => (
-            <Button
-              status="basic"
-              size="small"
-              appearance="ghost"
-              onPress={() => removeWord(id)}
-              accessoryLeft={removeIcon}
-            />
-          )}
-        />
-      );
-    }
   };
 
   const renderItem = ({item}) => {
@@ -225,7 +214,7 @@ export const Map = ({navigation}) => {
         <ListItem
           title={title}
           description={roadAddress}
-          onPress={() => placeClick(id, latitude, longitude, title, false)}
+          onPress={() => placeClick(id, latitude, longitude, title)}
         />
       );
     }
@@ -270,7 +259,7 @@ export const Map = ({navigation}) => {
           placeholder="가고 싶었던 곳을 검색하세요"
           value={value}
           status="warning"
-          onFocus={() => doFocus()}
+          // onFocus={() => doFocus()}
           onChangeText={text => onDebounceChange(text)}
           size="large"
           accessoryRight={() =>
@@ -327,7 +316,7 @@ export const Map = ({navigation}) => {
       {id !== 0 && (
         <View style={styles.contentBody}>
           <ScrollView>
-            <Layout style={styles.layoutContainer} level="4">
+            <Layout level="4">
               <ListItem
                 title={() => <Category value={searchItem.category} />}
                 description={() => <Title value={searchItem.name} />}
@@ -385,13 +374,25 @@ export const Map = ({navigation}) => {
               )}
             </Layout>
           </ScrollView>
-          <Toast config={toastConfig} />
-          <View>
-            <Button status="warning" size="large" onPress={() => doGo()}>
+          <Layout style={styles.buttonContainer} level="1">
+            <Button
+              style={styles.button}
+              status="warning"
+              appearance="outline"
+              size="large"
+              onPress={() => setId(0)}>
+              <Text style={styles.goText}>닫기</Text>
+            </Button>
+            <Button
+              style={styles.button}
+              status="warning"
+              size="large"
+              onPress={() => doGo()}>
               <Text style={styles.goText}>등록 </Text>
               {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
             </Button>
-          </View>
+          </Layout>
+          <Toast config={toastConfig} />
         </View>
       )}
     </Layout>
@@ -399,6 +400,14 @@ export const Map = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 2,
+  },
   maps: {
     width: '100%',
     height: '100%',
@@ -410,10 +419,6 @@ const styles = StyleSheet.create({
   searchInput: {
     padding: 6,
     backgroundColor: 'white',
-  },
-  layoutContainer: {
-    // paddingLeft: 10,
-    // paddingRight: 10,
   },
   contentBody: {
     flex: 1,

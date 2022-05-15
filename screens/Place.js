@@ -37,7 +37,7 @@ export const Place = observer(({navigation}) => {
   const [statusValue, setStatusValue] = useState('all');
   const [starIconColor, setStarIconColor] = useState('#d2d2d2');
   const [syncIconColor, setSyncIconColor] = useState('#d2d2d2');
-  const [starIconName, setStarIconName] = useState('star');
+  const [starIconName, setStarIconName] = useState('checkmark-circle-2');
   const [menuVisible, setMenuVisible] = useState(false);
   const [forceRefresh, setForceRefresh] = useState(false);
   const pulseIconRef = useRef();
@@ -94,25 +94,29 @@ export const Place = observer(({navigation}) => {
   const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
     onSuccess: items => {
       if (isFirst || forceRefresh) {
-        console.log('items all loading');
+        console.log('items all loading: ', items ? items.length : '');
         setAllData(items);
         setIsFirst(false);
         setForceRefresh(false);
       }
       console.log('getPlaces reload');
     },
-    select: items => {
-      console.log('select filter item');
-      const filterItems = items.filter(item => {
-        if (statusValue === PLACE_STATUS.ALL) {
-          return true;
-        } else if (statusValue === PLACE_STATUS.DONE) {
-          return item.status === PLACE_STATUS.DONE;
-        } else if (statusValue === PLACE_STATUS.BACKLOG)
-          return item.status === PLACE_STATUS.BACKLOG;
-      });
-      return filterItems;
-    },
+    select: useCallback(
+      items => {
+        console.log('select filter item: ', items ? items.length : '');
+
+        const filterItems = items.filter(item => {
+          if (statusValue === PLACE_STATUS.ALL) {
+            return true;
+          } else if (statusValue === PLACE_STATUS.DONE) {
+            return item.status === PLACE_STATUS.DONE;
+          } else if (statusValue === PLACE_STATUS.BACKLOG)
+            return item.status === PLACE_STATUS.BACKLOG;
+        });
+        return filterItems;
+      },
+      [statusValue],
+    ),
     onError: () => {
       console.log('getPlaces failed');
     },
@@ -152,17 +156,17 @@ export const Place = observer(({navigation}) => {
       case PLACE_STATUS.ALL:
         setStatusValue(PLACE_STATUS.DONE);
         setStarIconColor('#ffaa00');
-        setStarIconName('star');
+        setStarIconName('checkmark-circle-2');
         break;
       case PLACE_STATUS.DONE:
         setStatusValue(PLACE_STATUS.BACKLOG);
-        setStarIconColor('#ffaa00');
-        setStarIconName('star-outline');
+        setStarIconColor('#d2d2d2');
+        setStarIconName('checkmark-circle-2-outline');
         break;
       case PLACE_STATUS.BACKLOG:
         setStatusValue(PLACE_STATUS.ALL);
         setStarIconColor('#d2d2d2');
-        setStarIconName('star');
+        setStarIconName('checkmark-circle-2');
         break;
     }
   };
@@ -198,7 +202,13 @@ export const Place = observer(({navigation}) => {
         style={styles.logo}
         source={require('../assets/images/logo.png')}
       />
-      <Text {...props}>가봐야지도</Text>
+      <Text {...props}>
+        {statusValue === PLACE_STATUS.ALL
+          ? '가봐야지도'
+          : statusValue === PLACE_STATUS.DONE
+          ? '가봤지'
+          : '가봐야지'}
+      </Text>
     </View>
   );
 
@@ -220,28 +230,16 @@ export const Place = observer(({navigation}) => {
         title={renderTitle}
         accessoryRight={renderOverflowMenuAction}
       />
-      {/* <PlaceModalDetail
-        placeItem={placeItem}
-        isModalVisible={isModalVisible}
-        toggleModal={toggleModal}
-        doUpdatePlaceStatus={doUpdatePlaceStatus}
-      /> */}
       {placeStore.viewType === VIEW_TYPE.LIST ? (
         <PlaceList
           allData={allData}
           data={data}
           navigation={navigation}
-          // callbackModal={callbackModal}
           setForceRefresh={setForceRefresh}
           naviMapInfo={naviMapInfo}
         />
       ) : (
-        <PlaceMap
-          // allData={allData}
-          data={data}
-          // navigation={navigation}
-          // callbackModal={callbackModal}
-        />
+        <PlaceMap data={data} />
       )}
     </View>
   );
