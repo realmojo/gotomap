@@ -1,5 +1,7 @@
 export * from './BottomTab';
 export * from './Place';
+export * from './PlaceDone';
+export * from './PlaceBacklog';
 export * from './Map';
 export * from './My';
 export * from './MapDetail';

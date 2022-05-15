@@ -10,20 +10,18 @@ import {
   ListItem,
 } from '@ui-kitten/components';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
+import {PLACE_STATUS} from '../config/constants';
 import {TextDetail} from './index';
 import {updatePlaceStatus, updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
 const removeIcon = props => <Icon {...props} name="trash-2-outline" />;
-const checkIcon = props => <Icon {...props} name="check-circle" />;
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   const queryClient = useQueryClient();
   const {fullAddress, latitude, longitude, memo} = item.item;
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
-  const [stateMemo, setStateMemo] = useState('');
 
   const doDelete = (title, _id) => {
     Alert.alert(
@@ -54,12 +52,12 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
     doUpdatePlaceMemo({_id, memo: value});
   };
 
-  const doUpdatePlaceStatus = useCallback(
-    params => {
-      updateMutation.mutate(params);
-    },
-    [updateMutation],
-  );
+  // const doUpdatePlaceStatus = useCallback(
+  //   params => {
+  //     updateMutation.mutate(params);
+  //   },
+  //   [updateMutation],
+  // );
 
   const doDeletePlaceStatus = useCallback(
     params => {
@@ -100,18 +98,18 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
     },
   });
 
-  const updateMutation = useMutation(params => updatePlaceStatus(params), {
-    onMutate: item => {
-      const previousValue = queryClient.setQueryData('getPlaces', places => {
-        const findIndex = places.findIndex(place => {
-          return place._id === item._id;
-        });
-        places[findIndex].status = item.status;
-        return places;
-      });
-      return previousValue;
-    },
-  });
+  // const updateMutation = useMutation(params => updatePlaceStatus(params), {
+  //   onMutate: item => {
+  //     const previousValue = queryClient.setQueryData('getPlaces', places => {
+  //       const findIndex = places.findIndex(place => {
+  //         return place._id === item._id;
+  //       });
+  //       places[findIndex].status = item.status;
+  //       return places;
+  //     });
+  //     return previousValue;
+  //   },
+  // });
 
   const renderItemHeader = item => {
     const {_id, title, category, imageURL, status} = item;
@@ -132,7 +130,6 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
             )}
           </View>
         )}
-        // title={title}
         description={category}
         onPress={() => {
           callbackModal(item);
@@ -149,42 +146,40 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
           />
         )}
         accessoryRight={() => (
-          <>
-            {/* <Button
-              style={{marginRight: 10}}
-              size="tiny"
-              appearance={
-                status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
-              }
-              onPress={() =>
-                doUpdatePlaceStatus({
-                  _id,
-                  status:
-                    status === PLACE_STATUS.BACKLOG
-                      ? PLACE_STATUS.DONE
-                      : PLACE_STATUS.BACKLOG,
-                })
-              }
-              status="warning">
-              <Text style={{fontSize: 19}}>
-                {status === PLACE_STATUS.BACKLOG
-                  ? PLACE_STATUS_KR.BACKLOG
-                  : PLACE_STATUS_KR.DONE}
-              </Text>
-            </Button> */}
-            <Button
-              size="small"
-              appearance="ghost"
-              status="basic"
-              accessoryLeft={removeIcon}
-              onPress={() => doDelete(title, _id)}
-            />
-          </>
+          // {/* <Button
+          //   style={{marginRight: 10}}
+          //   size="tiny"
+          //   appearance={
+          //     status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
+          //   }
+          //   onPress={() =>
+          //     doUpdatePlaceStatus({
+          //       _id,
+          //       status:
+          //         status === PLACE_STATUS.BACKLOG
+          //           ? PLACE_STATUS.DONE
+          //           : PLACE_STATUS.BACKLOG,
+          //     })
+          //   }
+          //   status="warning">
+          //   <Text style={{fontSize: 19}}>
+          //     {status === PLACE_STATUS.BACKLOG
+          //       ? PLACE_STATUS_KR.BACKLOG
+          //       : PLACE_STATUS_KR.DONE}
+          //   </Text>
+          // </Button> */}
+          <Button
+            size="small"
+            appearance="ghost"
+            status="basic"
+            accessoryLeft={removeIcon}
+            onPress={() => doDelete(title, _id)}
+          />
         )}
       />
     );
   };
-
+  // console.log(item.item.status, item.item.title, item.item.memo);
   return useMemo(
     () => (
       <View>

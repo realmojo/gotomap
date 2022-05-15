@@ -1,75 +1,30 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {
   View,
   Text,
-  FlatList,
-  Animated,
   Dimensions,
   StyleSheet,
-  ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native';
-import useStore from '../stores';
-import moment from 'moment';
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   List,
-  Icon,
   Input,
-  Avatar,
   Layout,
-  Button,
   Divider,
   Spinner,
   ListItem,
 } from '@ui-kitten/components';
-import {PLACE_STATUS} from '../config/constants';
 import {debounce} from 'lodash';
-import {getMapDetailInfo, getSearchPlaces, addPlace} from '../api';
+import {getMapDetailInfo, getSearchPlaces} from '../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  Category,
-  Title,
-  isEmpty,
-  isEmptyArray,
-  optionText,
-  getSidoAndSigungu,
-} from '../utils';
-import {PlaceModalDetailText} from '../components';
+import BottomSheet from 'react-native-gesture-bottom-sheet';
+import {MapDetail} from './MapDetail';
 
-const removeIcon = props => <Icon {...props} name="close-outline" />;
-const toastConfig = {
-  success: props => (
-    <BaseToast
-      {...props}
-      style={{borderLeftColor: 'orange'}}
-      contentContainerStyle={{paddingHorizontal: 15}}
-      text1Style={{
-        fontSize: 24,
-        fontWeight: '800',
-      }}
-    />
-  ),
-  error: props => (
-    <ErrorToast
-      {...props}
-      text1Style={{
-        fontSize: 17,
-      }}
-      text2Style={{
-        fontSize: 15,
-      }}
-    />
-  ),
-};
-
-export const Map = ({navigation}) => {
-  const {loginStore} = useStore();
+export const Map = () => {
+  const bottomSheet = useRef();
   const [value, setValue] = useState('');
   const [id, setId] = useState(0);
-  const [isGo, setIsGo] = useState(false);
   const [searchItem, setSearchItem] = useState({});
   const [places, setPlaces] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
@@ -80,66 +35,10 @@ export const Map = ({navigation}) => {
     longitude: 126.97601589994,
   });
 
-  const doGo = async () => {
-    showToast();
-    const {
-      id: placeId,
-      name: title,
-      y: latitude,
-      x: longitude,
-      imageURL,
-      phone,
-      category,
-      fullAddress,
-      addressAbbr,
-      fullRoadAddress,
-      description,
-      options,
-      keywords,
-      bizhourInfo,
-    } = searchItem;
-    const {id: userId} = loginStore.userInfo;
-    const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
-    const params = {
-      placeId,
-      userId,
-      latitude, // 위도
-      longitude, // 경도
-      title,
-      description,
-      fullAddress,
-      fullRoadAddress,
-      imageURL,
-      category,
-      phone,
-      options: optionText(options),
-      keywords: keywords ? keywords.join('/') : '',
-      bizhourInfo: bizhourInfo ? bizhourInfo : '',
-      status: PLACE_STATUS.BACKLOG,
-      memo: '',
-      sido,
-      sigungu,
-      regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
-    };
-
-    try {
-      const res = await addPlace(params);
-      if (res) {
-        setIsGo(!isGo);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  // Toast 메세지 출력
-  const showToast = () => {
-    Toast.show({
-      text1: '등록완료',
-      text2: '언젠간 꼭 가보기로 해요! 일정에서 확인해보세요 👏',
-      position: 'bottom',
-      bottomOffset: 0,
-    });
+  const doClose = () => {
+    setValue('');
+    // setIsFocus(false);
+    setPlaces([]);
   };
 
   // const doFocus = async () => {
@@ -147,12 +46,6 @@ export const Map = ({navigation}) => {
   //   setHistoryWord(words);
   //   setIsFocus(true);
   // };
-
-  const doClose = () => {
-    setValue('');
-    // setIsFocus(false);
-    setPlaces([]);
-  };
 
   // const removeWord = async id => {
   //   const words = await getHistoryWords();
@@ -185,8 +78,15 @@ export const Map = ({navigation}) => {
   //   }
   // };
 
+  // const getHistoryWords = async () => {
+  //   const words = await AsyncStorage.getItem('words');
+  //   return words ? JSON.parse(words) : [];
+  // };
+
   const placeClick = async (id, latitude, longitude, title) => {
     setId(id);
+    bottomSheet.current.show();
+
     setCoordinate({
       latitude: Number(latitude),
       longitude: Number(longitude),
@@ -220,11 +120,6 @@ export const Map = ({navigation}) => {
     }
   };
 
-  const getHistoryWords = async () => {
-    const words = await AsyncStorage.getItem('words');
-    return words ? JSON.parse(words) : [];
-  };
-
   const doSearch = useCallback(
     debounce(async value => {
       setHistoryWord([]);
@@ -248,7 +143,7 @@ export const Map = ({navigation}) => {
   };
 
   const doMapDetail = () => {
-    navigation.push('mapDetail', {id});
+    bottomSheet.current.show();
   };
 
   return (
@@ -313,101 +208,14 @@ export const Map = ({navigation}) => {
           ) : null}
         </NaverMapView>
       </View>
-      {id !== 0 && (
-        <View style={styles.contentBody}>
-          <ScrollView>
-            <Layout level="4">
-              <ListItem
-                title={() => <Category value={searchItem.category} />}
-                description={() => <Title value={searchItem.name} />}
-                accessoryRight={() => (
-                  <Avatar
-                    source={
-                      searchItem.imageURL
-                        ? {uri: searchItem.imageURL}
-                        : require('../assets/images/logo.png')
-                    }
-                  />
-                )}
-              />
-              {isEmpty(searchItem.phone) && (
-                <PlaceModalDetailText
-                  iconName="phone"
-                  category="연락처"
-                  title={searchItem.phone}
-                />
-              )}
-              {isEmpty(searchItem.fullRoadAddress) && (
-                <PlaceModalDetailText
-                  iconName="map-marker"
-                  category="도로명주소"
-                  title={searchItem.fullRoadAddress}
-                />
-              )}
-              {isEmptyArray(searchItem.options) && (
-                <PlaceModalDetailText
-                  iconName="cube"
-                  category="옵션"
-                  title={optionText(searchItem.options)}
-                />
-              )}
-              {isEmptyArray(searchItem.keywords) && (
-                <PlaceModalDetailText
-                  iconName="key"
-                  category="키워드"
-                  title={searchItem.keywords.join('/')}
-                />
-              )}
-              {isEmpty(searchItem.bizhourInfo) && (
-                <PlaceModalDetailText
-                  iconName="clock-time-nine-outline"
-                  category="영업시간"
-                  title={searchItem.bizhourInfo}
-                />
-              )}
-              {isEmpty(searchItem.description) && (
-                <PlaceModalDetailText
-                  iconName="note-outline"
-                  category="설명"
-                  title={searchItem.description}
-                />
-              )}
-            </Layout>
-          </ScrollView>
-          <Layout style={styles.buttonContainer} level="1">
-            <Button
-              style={styles.button}
-              status="warning"
-              appearance="outline"
-              size="large"
-              onPress={() => setId(0)}>
-              <Text style={styles.goText}>닫기</Text>
-            </Button>
-            <Button
-              style={styles.button}
-              status="warning"
-              size="large"
-              onPress={() => doGo()}>
-              <Text style={styles.goText}>등록 </Text>
-              {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
-            </Button>
-          </Layout>
-          <Toast config={toastConfig} />
-        </View>
-      )}
+      <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
+        <MapDetail searchItem={searchItem} />
+      </BottomSheet>
     </Layout>
   );
 };
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 2,
-  },
   maps: {
     width: '100%',
     height: '100%',
@@ -419,20 +227,5 @@ const styles = StyleSheet.create({
   searchInput: {
     padding: 6,
     backgroundColor: 'white',
-  },
-  contentBody: {
-    flex: 1,
-    padding: 10,
-  },
-  imageWrap: {
-    width: Dimensions.get('screen').width,
-    height: 250,
-  },
-  image: {
-    width: '100%',
-    minHeight: 250,
-  },
-  goText: {
-    color: 'white',
   },
 });

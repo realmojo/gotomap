@@ -33,13 +33,13 @@ export const Place = observer(({navigation}) => {
   const queryClient = useQueryClient();
   const {placeStore} = useStore();
   const [allData, setAllData] = useState([]);
-  const [isFirst, setIsFirst] = useState(true);
-  const [statusValue, setStatusValue] = useState('all');
-  const [starIconColor, setStarIconColor] = useState('#d2d2d2');
+  // const [isFirst, setIsFirst] = useState(true);
+  const [statusValue, setStatusValue] = useState(PLACE_STATUS.BACKLOG);
   const [syncIconColor, setSyncIconColor] = useState('#d2d2d2');
-  const [starIconName, setStarIconName] = useState('checkmark-circle-2');
+  // const [starIconColor, setStarIconColor] = useState('#d2d2d2');
+  // const [starIconName, setStarIconName] = useState('checkmark-circle-2');
   const [menuVisible, setMenuVisible] = useState(false);
-  const [forceRefresh, setForceRefresh] = useState(false);
+  const [forceRefresh, setForceRefresh] = useState(true);
   const pulseIconRef = useRef();
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -93,10 +93,10 @@ export const Place = observer(({navigation}) => {
 
   const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
     onSuccess: items => {
-      if (isFirst || forceRefresh) {
+      if (forceRefresh) {
         console.log('items all loading: ', items ? items.length : '');
         setAllData(items);
-        setIsFirst(false);
+        // setIsFirst(false);
         setForceRefresh(false);
       }
       console.log('getPlaces reload');
@@ -106,16 +106,14 @@ export const Place = observer(({navigation}) => {
         console.log('select filter item: ', items ? items.length : '');
 
         const filterItems = items.filter(item => {
-          if (statusValue === PLACE_STATUS.ALL) {
-            return true;
-          } else if (statusValue === PLACE_STATUS.DONE) {
-            return item.status === PLACE_STATUS.DONE;
-          } else if (statusValue === PLACE_STATUS.BACKLOG)
+          if (statusValue === PLACE_STATUS.BACKLOG) {
             return item.status === PLACE_STATUS.BACKLOG;
+          } else if (statusValue === PLACE_STATUS.DONE)
+            return item.status === PLACE_STATUS.DONE;
         });
         return filterItems;
       },
-      [statusValue],
+      [statusValue, forceRefresh],
     ),
     onError: () => {
       console.log('getPlaces failed');
@@ -148,36 +146,37 @@ export const Place = observer(({navigation}) => {
         setStatusValue(PLACE_STATUS.BACKLOG);
         break;
     }
+    setForceRefresh(true);
     ToastAndroid.show('데이터를 새로 가져옵니다.', ToastAndroid.SHORT);
   };
 
-  const filterData = () => {
-    switch (statusValue) {
-      case PLACE_STATUS.ALL:
-        setStatusValue(PLACE_STATUS.DONE);
-        setStarIconColor('#ffaa00');
-        setStarIconName('checkmark-circle-2');
-        break;
-      case PLACE_STATUS.DONE:
-        setStatusValue(PLACE_STATUS.BACKLOG);
-        setStarIconColor('#d2d2d2');
-        setStarIconName('checkmark-circle-2-outline');
-        break;
-      case PLACE_STATUS.BACKLOG:
-        setStatusValue(PLACE_STATUS.ALL);
-        setStarIconColor('#d2d2d2');
-        setStarIconName('checkmark-circle-2');
-        break;
-    }
-  };
+  // const filterData = () => {
+  //   switch (statusValue) {
+  //     case PLACE_STATUS.ALL:
+  //       setStatusValue(PLACE_STATUS.DONE);
+  //       setStarIconColor('#ffaa00');
+  //       setStarIconName('checkmark-circle-2');
+  //       break;
+  //     case PLACE_STATUS.DONE:
+  //       setStatusValue(PLACE_STATUS.BACKLOG);
+  //       setStarIconColor('#d2d2d2');
+  //       setStarIconName('checkmark-circle-2-outline');
+  //       break;
+  //     case PLACE_STATUS.BACKLOG:
+  //       setStatusValue(PLACE_STATUS.ALL);
+  //       setStarIconColor('#d2d2d2');
+  //       setStarIconName('checkmark-circle-2');
+  //       break;
+  //   }
+  // };
 
   const renderOverflowMenuAction = () => (
     <React.Fragment>
       <TopNavigationAction icon={() => SyncIcon()} />
-      <TopNavigationAction
+      {/* <TopNavigationAction
         onPress={() => filterData()}
         icon={() => StarIcon(starIconColor, starIconName)}
-      />
+      /> */}
       <OverflowMenu
         anchor={renderMenuAction}
         visible={menuVisible}
@@ -235,11 +234,12 @@ export const Place = observer(({navigation}) => {
           allData={allData}
           data={data}
           navigation={navigation}
-          setForceRefresh={setForceRefresh}
+          refreshData={refreshData}
           naviMapInfo={naviMapInfo}
+          setStatusValue={setStatusValue}
         />
       ) : (
-        <PlaceMap data={data} />
+        <PlaceMap data={data} setStatusValue={setStatusValue} />
       )}
     </View>
   );

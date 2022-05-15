@@ -1,30 +1,39 @@
 import React, {useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {Place, Map, My} from './index';
+// import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
-const Tab = createMaterialBottomTabNavigator();
+import {PlaceBacklog, PlaceDone, Map, My} from './index';
+
+const Tab = createMaterialTopTabNavigator();
+// const Tab = createMaterialBottomTabNavigator();
 
 export const BottomTab = () => {
-  const [currentScreen, setCurrentScreen] = useState('Map');
-  const [togglePlace, setTogglePlace] = useState(true);
   return (
     <Tab.Navigator
-      initialRouteName="Map"
-      activeColor="#ff6721"
-      inactiveColor="#7b7b7b"
-      barStyle={{backgroundColor: '#fff'}}>
+      initialRouteName="PlaceBacklog"
+      screenOptions={{
+        tabBarActiveTintColor: '#7b7b7b',
+        tabBarInactiveTintColor: '#dedede',
+        tabBarLabelStyle: {fontSize: 12},
+        tabBarIcon: {focused: true, color: '#aaa'},
+        tabBarStyle: {backgroundColor: 'white'},
+        tabBarPressColor: '#dedede',
+      }}
+      tabBarPosition="bottom">
       <Tab.Screen
-        name="Place"
-        component={Place}
-        listeners={{
-          tabPress: () => {
-            if (currentScreen === 'Place') {
-              setTogglePlace(!togglePlace);
-            }
-            setCurrentScreen('Place');
-          },
+        name="Map"
+        component={Map}
+        options={{
+          tabBarLabel: '검색',
+          tabBarIcon: ({color}) => (
+            <MaterialCommunityIcons name="magnify" color={color} size={20} />
+          ),
         }}
+      />
+      <Tab.Screen
+        name="PlaceBacklog"
+        component={PlaceBacklog}
         options={{
           tabBarLabel: '가봐야지',
           tabBarIcon: ({color}) => (
@@ -37,19 +46,13 @@ export const BottomTab = () => {
         }}
       />
       <Tab.Screen
-        name="Map"
-        component={Map}
+        name="PlaceDone"
+        component={PlaceDone}
         options={{
-          tabBarLabel: '검색',
+          tabBarLabel: '가봤지',
           tabBarIcon: ({color}) => (
-            <MaterialCommunityIcons name="magnify" color={color} size={20} />
+            <MaterialCommunityIcons name="map-marker" color={color} size={20} />
           ),
-        }}
-        listeners={{
-          tabPress: e => {
-            // e.preventDefault();
-            setCurrentScreen('Map');
-          },
         }}
       />
       <Tab.Screen
@@ -64,12 +67,6 @@ export const BottomTab = () => {
               size={20}
             />
           ),
-        }}
-        listeners={{
-          tabPress: e => {
-            // e.preventDefault();
-            setCurrentScreen('My');
-          },
         }}
       />
     </Tab.Navigator>

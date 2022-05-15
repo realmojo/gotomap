@@ -5,5 +5,6 @@ export * from './TextDetail';
 export * from './PlaceListItem';
 export * from './LoadingIndicator';
 export * from './Error';
-export * from './PlaceModalDetail';
-export * from './PlaceModalDetailText';
+export * from './PlaceTab';
+export * from './PlaceDetail';
+export * from './PlaceDetailText';

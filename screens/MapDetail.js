@@ -1,22 +1,28 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Image, Dimensions, ScrollView} from 'react-native';
-import {Carousel, PlaceModalDetailText} from '../components';
-import {Text, Button, Layout, ListItem} from '@ui-kitten/components';
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getMapDetailInfo, addPlace} from '../api';
-import moment from 'moment';
-import useStore from '../stores';
+import React, {useState} from 'react';
+import {PlaceDetailText} from '../components';
+import {addPlace} from '../api';
 import {PLACE_STATUS} from '../config/constants';
-import {LoadingIndicator} from '../components';
 import {
-  getSidoAndSigungu,
-  isEmpty,
-  isEmptyArray,
   Category,
   Title,
+  isEmpty,
+  isEmptyArray,
   optionText,
+  getSidoAndSigungu,
 } from '../utils';
+import {
+  View,
+  Text,
+  Image,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
+import useStore from '../stores';
+import moment from 'moment';
+import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Avatar, Layout, Button, ListItem} from '@ui-kitten/components';
 
 const toastConfig = {
   success: props => (
@@ -43,11 +49,8 @@ const toastConfig = {
   ),
 };
 
-export const MapDetail = ({route: {params}}) => {
+export const MapDetail = ({searchItem}) => {
   const {loginStore} = useStore();
-  const {id} = params;
-  const [item, setItem] = useState({});
-  const [page, setPage] = useState(0);
   const [isGo, setIsGo] = useState(false);
 
   const doGo = async () => {
@@ -67,7 +70,7 @@ export const MapDetail = ({route: {params}}) => {
       options,
       keywords,
       bizhourInfo,
-    } = item;
+    } = searchItem;
     const {id: userId} = loginStore.userInfo;
     const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
     const params = {
@@ -102,112 +105,94 @@ export const MapDetail = ({route: {params}}) => {
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const data = await getMapDetailInfo(id);
-      setItem(data);
-    }
-    fetchData();
-  }, []);
-
-  const _renderItem = ({item}) => (
-    <View style={styles.imageWrap}>
-      <Image
-        style={styles.image}
-        source={{
-          uri: item.url,
-        }}
-      />
-    </View>
-  );
-
   // Toast 메세지 출력
   const showToast = () => {
     Toast.show({
       text1: '등록완료',
       text2: '언젠간 꼭 가보기로 해요! 일정에서 확인해보세요 👏',
       position: 'bottom',
-      bottomOffset: 60,
+      bottomOffset: 0,
     });
   };
 
   return (
-    <Layout style={{flex: 1}}>
-      {!item.name ? (
-        <LoadingIndicator />
-      ) : (
-        <>
-          <ScrollView>
-            <Layout style={styles.container} level="1">
-              {item.imageURL && (
-                <Carousel
-                  page={page}
-                  setPage={setPage}
-                  gap={0}
-                  data={item.images}
-                  pageWidth={Dimensions.get('screen').width}
-                  RenderItem={_renderItem}
-                />
-              )}
-              <ListItem
-                title={() => <Category value={item.category} />}
-                description={() => <Title value={item.name} />}
-              />
-              {isEmpty(item.phone) && (
-                <PlaceModalDetailText
-                  iconName="phone"
-                  category="연락처"
-                  title={item.phone}
-                />
-              )}
-              {isEmpty(item.fullRoadAddress) && (
-                <PlaceModalDetailText
-                  iconName="map-marker"
-                  category="도로명주소"
-                  title={item.fullRoadAddress}
-                />
-              )}
-
-              {isEmptyArray(item.options) && (
-                <PlaceModalDetailText
-                  iconName="cube"
-                  category="옵션"
-                  title={optionText(item.options)}
-                />
-              )}
-              {isEmptyArray(item.keywords) && (
-                <PlaceModalDetailText
-                  iconName="key"
-                  category="키워드"
-                  title={item.keywords.join('/')}
-                />
-              )}
-              {isEmpty(item.bizhourInfo) && (
-                <PlaceModalDetailText
-                  iconName="clock-time-nine-outline"
-                  category="영업시간"
-                  title={item.bizhourInfo}
-                />
-              )}
-              {isEmpty(item.description) && (
-                <PlaceModalDetailText
-                  iconName="note-outline"
-                  category="설명"
-                  title={item.description}
-                />
-              )}
-            </Layout>
-          </ScrollView>
-          <Toast config={toastConfig} />
-          <View>
-            <Button status="warning" size="large" onPress={() => doGo()}>
-              <Text style={styles.goText}>등록 </Text>
-              {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
-            </Button>
+    <View style={styles.contentBody}>
+      <ScrollView>
+        <ListItem
+          style={{backgroundColor: 'transparent'}}
+          title={() => <Category value={searchItem.category} />}
+          description={() => <Title value={searchItem.name} />}
+          accessoryRight={() => (
+            <Avatar
+              source={
+                searchItem.imageURL
+                  ? {uri: searchItem.imageURL}
+                  : require('../assets/images/logo.png')
+              }
+            />
+          )}
+        />
+        {searchItem.imageURL && (
+          <View style={styles.imageWrap}>
+            <Image
+              style={styles.image}
+              source={{
+                uri: searchItem.imageURL,
+              }}
+            />
           </View>
-        </>
-      )}
-    </Layout>
+        )}
+        {isEmpty(searchItem.phone) && (
+          <PlaceDetailText
+            iconName="phone"
+            category="연락처"
+            title={searchItem.phone}
+          />
+        )}
+        {isEmpty(searchItem.fullRoadAddress) && (
+          <PlaceDetailText
+            iconName="map-marker"
+            category="도로명주소"
+            title={searchItem.fullRoadAddress}
+          />
+        )}
+        {isEmptyArray(searchItem.options) && (
+          <PlaceDetailText
+            iconName="cube"
+            category="옵션"
+            title={optionText(searchItem.options)}
+          />
+        )}
+        {isEmptyArray(searchItem.keywords) && (
+          <PlaceDetailText
+            iconName="key"
+            category="키워드"
+            title={searchItem.keywords.join('/')}
+          />
+        )}
+        {isEmpty(searchItem.bizhourInfo) && (
+          <PlaceDetailText
+            iconName="clock-time-nine-outline"
+            category="영업시간"
+            title={searchItem.bizhourInfo}
+          />
+        )}
+        {isEmpty(searchItem.description) && (
+          <PlaceDetailText
+            iconName="note-outline"
+            category="설명"
+            title={searchItem.description}
+          />
+        )}
+      </ScrollView>
+      <Layout level="1">
+        <Button status="warning" size="large" onPress={() => doGo()}>
+          <Text style={styles.goText}>등록 </Text>
+          {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
+        </Button>
+      </Layout>
+      <Toast config={toastConfig} />
+    </View>
   );
 };
 
@@ -216,6 +201,10 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
   },
+  contentBody: {
+    flex: 1,
+    padding: 10,
+  },
   imageWrap: {
     width: Dimensions.get('screen').width,
     height: 250,
@@ -223,9 +212,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     minHeight: 250,
-  },
-  title: {
-    // color: 'black',
   },
   goText: {
     color: 'white',

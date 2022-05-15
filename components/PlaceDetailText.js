@@ -18,9 +18,10 @@ const PhontText = ({title}) => (
   </Text>
 );
 
-export const PlaceModalDetailText = ({iconName, category, title, doPress}) => {
+export const PlaceDetailText = ({iconName, category, title, doPress}) => {
   return (
     <ListItem
+      style={{backgroundColor: 'transparent'}}
       onPress={doPress ? doPress : null}
       title={() => (
         <Text style={{fontSize: 12, marginLeft: 10, color: '#aaa'}}>
