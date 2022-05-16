@@ -1,51 +1,29 @@
 import React, {useState, useCallback, useMemo, useRef} from 'react';
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  RefreshControl,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, View, RefreshControl, ScrollView} from 'react-native';
 import {
   List,
-  Text,
   Layout,
   Select,
-  Button,
   IndexPath,
   SelectItem,
 } from '@ui-kitten/components';
-import {
-  PLACE_STATUS,
-  PLACE_STATUS_KR,
-  SIDO,
-  SIGUNGU,
-} from '../config/constants';
+import {SIDO, SIGUNGU} from '../config/constants';
 import {useQueryClient} from 'react-query';
 import {PlaceListItem} from './index';
 import {Nothing} from './Nothing';
 import {PlaceDetail} from './PlaceDetail';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
-import {PlaceTab} from './PlaceTab';
-
-const {width, height} = Dimensions.get('window');
+import useStore from '../stores';
 
 const defaultSigungu = {
   name_en: 'All',
   name_kr: '전체(시/군/구)',
 };
 
-const PlaceList = ({
-  allData,
-  data = [],
-  navigation,
-  naviMapInfo,
-  refreshData,
-  setStatusValue,
-}) => {
+const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
   const queryClient = useQueryClient();
   const bottomSheet = useRef();
-  const [statusButton, setStatusButton] = useState(PLACE_STATUS.ALL);
+  const {placeStore} = useStore();
   const [placeItem, setPlaceItem] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [selectedSido, setSelectedSido] = useState(SIDO[0]);
@@ -57,22 +35,9 @@ const PlaceList = ({
   const [sigunguOptions, setSigunguOptions] = useState([]);
 
   console.log('Place list');
-  // console.log(
-  //   `Place list: `,
-  //   placeItem.title,
-  //   placeItem.memo,
-  //   placeItem.status,
-  // );
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
-
-  // const filterStatusData = value => {
-  //   setStatusButton(value);
-  //   setTimeout(() => {
-  //     setStatusValue(value);
-  //   }, 10);
-  // };
 
   const openModal = item => {
     setPlaceItem(item);
@@ -81,12 +46,10 @@ const PlaceList = ({
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setStatusButton(PLACE_STATUS.ALL);
-    setStatusValue(PLACE_STATUS.ALL);
-    // queryClient.refetchQueries('getPlaces');
+    placeStore.setForceRefresh(true);
+    queryClient.refetchQueries(queryKey);
     setSelectedSido(SIDO[0]);
     setSelectedSigungu(defaultSigungu);
-    refreshData();
     wait(1000).then(() => {
       setRefreshing(false);
     });
@@ -94,14 +57,14 @@ const PlaceList = ({
 
   const filterListData = useCallback(({name_en, name_kr}, type) => {
     if (type === 'sido') {
-      queryClient.setQueryData('getPlaces', () => {
+      queryClient.setQueryData(queryKey, () => {
         if (name_en !== 'All') {
           return allData.filter(item => item.sido === name_kr);
         }
         return allData;
       });
     } else if (type === 'sigungu') {
-      queryClient.setQueriesData('getPlaces', () => {
+      queryClient.setQueriesData(queryKey, () => {
         if (name_en !== 'All') {
           return allData.filter(
             item =>
@@ -137,54 +100,10 @@ const PlaceList = ({
 
   return useMemo(
     () => (
-      <View style={{marginBottom: 210}}>
+      <View>
         <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
-          <PlaceDetail placeItem={placeItem} />
+          <PlaceDetail placeItem={placeItem} queryKey={queryKey} />
         </BottomSheet>
-        {/* <Layout style={{flexDirection: 'row', marginHorizontal: 6}} level="2">
-          <Button
-            style={
-              statusButton === PLACE_STATUS.ALL
-                ? styles.buttonActive
-                : styles.button
-            }
-            appearance={
-              statusButton === PLACE_STATUS.ALL ? 'filled' : 'outline'
-            }
-            status={statusButton === PLACE_STATUS.ALL ? 'warning' : 'basic'}
-            size="small"
-            onPress={() => filterStatusData(PLACE_STATUS.ALL)}>
-            {PLACE_STATUS_KR.ALL}
-          </Button>
-          <Button
-            style={
-              statusButton === PLACE_STATUS.DONE
-                ? styles.buttonActive
-                : styles.button
-            }
-            appearance={
-              statusButton === PLACE_STATUS.DONE ? 'filled' : 'outline'
-            }
-            status={statusButton === PLACE_STATUS.DONE ? 'warning' : 'basic'}
-            size="small"
-            onPress={() => filterStatusData(PLACE_STATUS.DONE)}>
-            {PLACE_STATUS_KR.DONE}
-          </Button>
-          <Button
-            style={
-              statusButton === PLACE_STATUS.BACKLOG
-                ? styles.buttonActive
-                : styles.button
-            }
-            appearance={
-              statusButton === PLACE_STATUS.BACKLOG ? 'filled' : 'outline'
-            }
-            status={statusButton === PLACE_STATUS.BACKLOG ? 'warning' : 'basic'}
-            size="small"
-            onPress={() => filterStatusData(PLACE_STATUS.BACKLOG)}>
-            {PLACE_STATUS_KR.BACKLOG}
-          </Button>
-        </Layout> */}
         <Layout style={styles.layoutContainer} level="2">
           <Select
             style={styles.select}
@@ -216,6 +135,7 @@ const PlaceList = ({
                 item={item}
                 callbackModal={openModal}
                 naviMapInfo={naviMapInfo}
+                queryKey={queryKey}
               />
             )}
             refreshControl={
@@ -232,7 +152,14 @@ const PlaceList = ({
         )}
       </View>
     ),
-    [data, placeItem.status, placeItem.memo, refreshing, statusButton],
+    [
+      data.length,
+      selectedSido.name_kr,
+      selectedSigungu.name_kr,
+      placeItem.status,
+      placeItem.memo,
+      refreshing,
+    ],
   );
 };
 const styles = StyleSheet.create({
@@ -269,7 +196,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 8,
-    paddingBottom: 4,
+    paddingBottom: 224,
   },
   item: {
     marginVertical: 4,

@@ -15,7 +15,7 @@ import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {useQueryClient, useMutation} from 'react-query';
 import {Category, Title} from '../utils';
 
-export const PlaceDetail = ({placeItem}) => {
+export const PlaceDetail = ({placeItem, queryKey}) => {
   const queryClient = useQueryClient();
   const {
     _id,
@@ -33,8 +33,6 @@ export const PlaceDetail = ({placeItem}) => {
     status,
     memo,
   } = placeItem;
-
-  // console.log('status: ', status);
 
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
@@ -65,7 +63,7 @@ export const PlaceDetail = ({placeItem}) => {
 
   const updateMutationMemo = useMutation(params => updatePlaceMemo(params), {
     onMutate: item => {
-      const previousValue = queryClient.setQueryData('getPlaces', places => {
+      const previousValue = queryClient.setQueryData(queryKey, places => {
         const findIndex = places.findIndex(place => {
           return place._id === item._id;
         });
@@ -80,16 +78,13 @@ export const PlaceDetail = ({placeItem}) => {
     params => updatePlaceStatus(params),
     {
       onMutate: item => {
-        // console.log(item);
-        const previousValue = queryClient.setQueryData('getPlaces', places => {
+        const previousValue = queryClient.setQueryData(queryKey, places => {
           const findIndex = places.findIndex(place => {
             return place._id === item._id;
           });
           places[findIndex].status = item.status;
-          // console.log(places[findIndex]);
           return places;
         });
-        // console.log(previousValue);
         return previousValue;
       },
     },

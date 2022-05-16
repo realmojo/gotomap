@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
-import {Button, Layout, Spinner, Text} from '@ui-kitten/components';
+import {Button, Layout, Text} from '@ui-kitten/components';
 import useStore from '../stores';
 import {useQuery} from 'react-query';
 import {getId} from '../api';
@@ -8,7 +8,7 @@ import {LoadingIndicator} from '../components';
 
 export const Login = () => {
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
-  const {loginStore, userStore, placeStore} = useStore();
+  const {loginStore, userStore} = useStore();
   const doLogin = () => {
     setIsKakaoLoading(true);
     loginStore.socialKakaoLogin();
@@ -23,9 +23,6 @@ export const Login = () => {
         userStore.setId(data);
       }
     },
-  });
-  useEffect(() => {
-    placeStore.initViewType();
   });
   if (isLoading) {
     return <LoadingIndicator />;

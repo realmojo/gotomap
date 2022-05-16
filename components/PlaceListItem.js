@@ -17,7 +17,7 @@ import {useQueryClient, useMutation} from 'react-query';
 
 const removeIcon = props => <Icon {...props} name="trash-2-outline" />;
 
-const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
+const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
   const queryClient = useQueryClient();
   const {fullAddress, latitude, longitude, memo} = item.item;
   const [isMemoInput, setIsMemoInput] = useState(false);
@@ -36,7 +36,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
         {
           text: '삭제',
           onPress: () => {
-            doDeletePlaceStatus(_id);
+            doDeletePlace(_id);
           },
         },
       ],
@@ -59,7 +59,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
   //   [updateMutation],
   // );
 
-  const doDeletePlaceStatus = useCallback(
+  const doDeletePlace = useCallback(
     params => {
       deleteMutation.mutate(params);
     },
@@ -75,20 +75,36 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
 
   const updateMutationMemo = useMutation(params => updatePlaceMemo(params), {
     onMutate: item => {
-      const previousValue = queryClient.setQueryData('getPlaces', places => {
+      const previousValue = queryClient.getQueryData(queryKey);
+      queryClient.setQueryData(queryKey, places => {
         const findIndex = places.findIndex(place => {
           return place._id === item._id;
         });
         places[findIndex].memo = item.memo;
         return places;
       });
+
       return previousValue;
+      // const previous = queryClient.getQueryData(queryKey);
+      // console.log(previous.length);
+      // const newData = previous.map(place => {
+      //   if (place._id === item._id) {
+      //     place.memo = item.memo;
+      //   }
+      //   // const findIndex = places.findIndex(place => {
+      //   //   return place._id === item._id;
+      //   // });
+      //   // if (findIndex) {
+      //   // }
+      //   return place;
+      // });
+      // queryClient.setQueryData(queryKey, newData);
     },
   });
 
   const deleteMutation = useMutation(params => removePlace(params), {
     onMutate: item => {
-      const previosValue = queryClient.setQueryData('getPlaces', places => {
+      const previosValue = queryClient.setQueryData(queryKey, places => {
         const newPlaces = places.filter(place => {
           return place._id !== item;
         });
@@ -179,9 +195,9 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
       />
     );
   };
-  // console.log(item.item.status, item.item.title, item.item.memo);
   return useMemo(
     () => (
+      // return (
       <View>
         <Card
           style={styles.item}
@@ -227,7 +243,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo}) => {
         </Card>
       </View>
     ),
-    [item.item.status, item.item.title, item.item.memo, isMemoInput, value],
+    [item.item.status, item.item.memo, isMemoInput, value],
   );
 };
 

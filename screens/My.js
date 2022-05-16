@@ -22,7 +22,7 @@ export const My = observer(() => {
   }, []);
 
   return (
-    <Layout>
+    <Layout level="2">
       <View style={styles.container}>
         <View style={styles.logoWrap}>
           <Image
@@ -56,22 +56,24 @@ export const My = observer(() => {
           </View>
         </Layout>
       </View>
-      <ListItem
-        style={styles.listItem}
-        title="피드백을 주세요"
-        onPress={() =>
-          Linking.openURL(
-            'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
-          )
-        }
-      />
-      <Divider />
-      <ListItem
-        style={styles.listItem}
-        title="로그아웃"
-        onPress={() => doLogout()}
-      />
-      <Divider />
+      <Layout level="2" style={{height: '100%'}}>
+        <ListItem
+          style={styles.listItem}
+          title="피드백을 주세요"
+          onPress={() =>
+            Linking.openURL(
+              'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
+            )
+          }
+        />
+        <Divider />
+        <ListItem
+          style={styles.listItem}
+          title="로그아웃"
+          onPress={() => doLogout()}
+        />
+        <Divider />
+      </Layout>
     </Layout>
   );
 });

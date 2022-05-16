@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {PlaceDetailText} from '../components';
+import {LoadingIndicator, PlaceDetailText} from '../components';
 import {addPlace} from '../api';
 import {PLACE_STATUS} from '../config/constants';
 import {
@@ -23,6 +23,7 @@ import moment from 'moment';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Avatar, Layout, Button, ListItem} from '@ui-kitten/components';
+import {useQueryClient, useMutation} from 'react-query';
 
 const toastConfig = {
   success: props => (
@@ -50,8 +51,15 @@ const toastConfig = {
 };
 
 export const MapDetail = ({searchItem}) => {
-  const {loginStore} = useStore();
+  const queryClient = useQueryClient();
+  const {loginStore, placeStore} = useStore();
   const [isGo, setIsGo] = useState(false);
+
+  const addMutation = useMutation(addPlace, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('getPlaceBacklogs');
+    },
+  });
 
   const doGo = async () => {
     showToast();
@@ -96,10 +104,9 @@ export const MapDetail = ({searchItem}) => {
     };
 
     try {
-      const res = await addPlace(params);
-      if (res) {
-        setIsGo(!isGo);
-      }
+      placeStore.setForceRefresh(true);
+      addMutation.mutate(params);
+      setIsGo(!isGo);
     } catch (e) {
       console.log(e);
     }
@@ -117,81 +124,87 @@ export const MapDetail = ({searchItem}) => {
 
   return (
     <View style={styles.contentBody}>
-      <ScrollView>
-        <ListItem
-          style={{backgroundColor: 'transparent'}}
-          title={() => <Category value={searchItem.category} />}
-          description={() => <Title value={searchItem.name} />}
-          accessoryRight={() => (
-            <Avatar
-              source={
-                searchItem.imageURL
-                  ? {uri: searchItem.imageURL}
-                  : require('../assets/images/logo.png')
-              }
+      {!searchItem.name ? (
+        <LoadingIndicator />
+      ) : (
+        <>
+          <ScrollView>
+            <ListItem
+              style={{backgroundColor: 'transparent'}}
+              title={() => <Category value={searchItem.category} />}
+              description={() => <Title value={searchItem.name} />}
+              accessoryRight={() => (
+                <Avatar
+                  source={
+                    searchItem.imageURL
+                      ? {uri: searchItem.imageURL}
+                      : require('../assets/images/logo.png')
+                  }
+                />
+              )}
             />
-          )}
-        />
-        {searchItem.imageURL && (
-          <View style={styles.imageWrap}>
-            <Image
-              style={styles.image}
-              source={{
-                uri: searchItem.imageURL,
-              }}
-            />
-          </View>
-        )}
-        {isEmpty(searchItem.phone) && (
-          <PlaceDetailText
-            iconName="phone"
-            category="연락처"
-            title={searchItem.phone}
-          />
-        )}
-        {isEmpty(searchItem.fullRoadAddress) && (
-          <PlaceDetailText
-            iconName="map-marker"
-            category="도로명주소"
-            title={searchItem.fullRoadAddress}
-          />
-        )}
-        {isEmptyArray(searchItem.options) && (
-          <PlaceDetailText
-            iconName="cube"
-            category="옵션"
-            title={optionText(searchItem.options)}
-          />
-        )}
-        {isEmptyArray(searchItem.keywords) && (
-          <PlaceDetailText
-            iconName="key"
-            category="키워드"
-            title={searchItem.keywords.join('/')}
-          />
-        )}
-        {isEmpty(searchItem.bizhourInfo) && (
-          <PlaceDetailText
-            iconName="clock-time-nine-outline"
-            category="영업시간"
-            title={searchItem.bizhourInfo}
-          />
-        )}
-        {isEmpty(searchItem.description) && (
-          <PlaceDetailText
-            iconName="note-outline"
-            category="설명"
-            title={searchItem.description}
-          />
-        )}
-      </ScrollView>
-      <Layout level="1">
-        <Button status="warning" size="large" onPress={() => doGo()}>
-          <Text style={styles.goText}>등록 </Text>
-          {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
-        </Button>
-      </Layout>
-      <Toast config={toastConfig} />
+            {searchItem.imageURL && (
+              <View style={styles.imageWrap}>
+                <Image
+                  style={styles.image}
+                  source={{
+                    uri: searchItem.imageURL,
+                  }}
+                />
+              </View>
+            )}
+            {isEmpty(searchItem.phone) && (
+              <PlaceDetailText
+                iconName="phone"
+                category="연락처"
+                title={searchItem.phone}
+              />
+            )}
+            {isEmpty(searchItem.fullRoadAddress) && (
+              <PlaceDetailText
+                iconName="map-marker"
+                category="도로명주소"
+                title={searchItem.fullRoadAddress}
+              />
+            )}
+            {isEmptyArray(searchItem.options) && (
+              <PlaceDetailText
+                iconName="cube"
+                category="옵션"
+                title={optionText(searchItem.options)}
+              />
+            )}
+            {isEmptyArray(searchItem.keywords) && (
+              <PlaceDetailText
+                iconName="key"
+                category="키워드"
+                title={searchItem.keywords.join('/')}
+              />
+            )}
+            {isEmpty(searchItem.bizhourInfo) && (
+              <PlaceDetailText
+                iconName="clock-time-nine-outline"
+                category="영업시간"
+                title={searchItem.bizhourInfo}
+              />
+            )}
+            {isEmpty(searchItem.description) && (
+              <PlaceDetailText
+                iconName="note-outline"
+                category="설명"
+                title={searchItem.description}
+              />
+            )}
+          </ScrollView>
+          <Layout level="1">
+            <Button status="warning" size="large" onPress={() => doGo()}>
+              <Text style={styles.goText}>등록 </Text>
+              {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
+            </Button>
+          </Layout>
+          <Toast config={toastConfig} />
+        </>
+      )}
     </View>
   );
 };

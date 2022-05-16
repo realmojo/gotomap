@@ -1,17 +1,8 @@
 import axios from 'axios';
 import {API_URL} from './index';
 import useStore from '../stores';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {userStore} = useStore();
-
-const getViewType = async () => {
-  return await AsyncStorage.getItem('viewType');
-};
-
-const setViewType = async value => {
-  AsyncStorage.setItem('viewType', value);
-};
 
 const getPlace = id => {
   return new Promise((resolve, reject) => {
@@ -69,13 +60,13 @@ const updatePlaceMemo = async ({_id, memo}) => {
   });
 };
 
-const getPlaces = () => {
-  console.log('getPlace Api');
+const getPlaceByStatus = status => {
+  console.log(`getPlace ${status} Api`);
   const userId = userStore.userId;
   if (userId) {
     return new Promise((resolve, reject) => {
       axios
-        .get(`${API_URL}/place/all?userId=${userId}`)
+        .get(`${API_URL}/place/all/${status}?userId=${userId}`)
         .then(res => {
           resolve(res.data);
         })
@@ -116,11 +107,9 @@ const removePlace = _id => {
 export {
   addPlace,
   getPlace,
-  getPlaces,
+  getPlaceByStatus,
   getPlaceCount,
   updatePlaceStatus,
   updatePlaceMemo,
   removePlace,
-  setViewType,
-  getViewType,
 };

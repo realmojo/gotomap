@@ -35,7 +35,6 @@ const getAddress = () => {
   const url = `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURI(
     '문래동2가 48-6',
   )}`;
-  console.log(url, headers);
   return new Promise((resolve, reject) => {
     axios
       .get(url, {headers})
@@ -56,7 +55,6 @@ export const NaverMap = () => {
   const getData = async () => {
     // const res = await getAddress();
     const res = await getPlace();
-    console.log(res.data);
   };
 
   return (

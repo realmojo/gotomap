@@ -1,17 +1,15 @@
-import React, {useState, useCallback} from 'react';
-import {View, StyleSheet, ToastAndroid} from 'react-native';
-import {Text, Avatar, TopNavigation} from '@ui-kitten/components';
-import {useQueryClient} from 'react-query';
-import {getPlaces} from '../api';
+import React, {useState} from 'react';
+import {View, StyleSheet} from 'react-native';
+import {Text, Avatar, TopNavigation, Layout} from '@ui-kitten/components';
+import {getPlaceByStatus} from '../api';
 import {PlaceList, LoadingIndicator, Error} from '../components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
 import {useQuery} from 'react-query';
+import useStore from '../stores';
 
 export const PlaceBacklog = ({navigation}) => {
-  const queryClient = useQueryClient();
   const [allData, setAllData] = useState([]);
-  const [forceRefresh, setForceRefresh] = useState(true);
-  const [statusValue, setStatusValue] = useState(PLACE_STATUS.BACKLOG);
+  const {placeStore} = useStore();
   const renderTitle = props => (
     <View style={styles.titleContainer}>
       <Avatar
@@ -22,38 +20,27 @@ export const PlaceBacklog = ({navigation}) => {
     </View>
   );
 
-  const {isLoading, data, error} = useQuery('getPlaces', getPlaces, {
-    onSuccess: items => {
-      if (forceRefresh) {
-        console.log('items all loading: ', items ? items.length : '');
-        setAllData(items);
-        // setIsFirst(false);
-        setForceRefresh(false);
-      }
-      console.log('getPlaces reload');
-    },
-    select: useCallback(
-      items => {
-        console.log('select filter item: ', items ? items.length : '');
-
-        const filterItems = items.filter(item => {
-          return item.status === PLACE_STATUS.BACKLOG;
-        });
-        return filterItems;
+  const {isLoading, data, error} = useQuery(
+    'getPlaceBacklogs',
+    () => getPlaceByStatus(PLACE_STATUS.BACKLOG),
+    {
+      onSuccess: items => {
+        console.log('forceRefresh: ', placeStore.forceRefresh);
+        if (placeStore.forceRefresh) {
+          console.log(
+            'getPlaceBacklogs items all loading: ',
+            items ? items.length : '',
+          );
+          setAllData(items);
+          placeStore.setForceRefresh(false);
+        }
+        console.log('getPlaceBacklogs getPlaces reload');
       },
-      [statusValue, forceRefresh],
-    ),
-    onError: () => {
-      console.log('getPlaces failed');
+      onError: () => {
+        console.log('getPlaceBacklogs failed');
+      },
     },
-  });
-
-  const refreshData = () => {
-    queryClient.refetchQueries('getPlaces');
-    setStatusValue(PLACE_STATUS.BACKLOG);
-    setForceRefresh(true);
-    ToastAndroid.show('데이터를 새로 가져옵니다.', ToastAndroid.SHORT);
-  };
+  );
 
   const naviMapInfo = coordinate => {
     navigation.push('mapInfo', {coordinate});
@@ -68,24 +55,23 @@ export const PlaceBacklog = ({navigation}) => {
   }
 
   return (
-    <View>
-      <TopNavigation
-        title={renderTitle}
-        // accessoryRight={renderOverflowMenuAction}
-      />
+    <Layout level="2" style={styles.layoutContainer}>
+      <TopNavigation title={renderTitle} />
       <PlaceList
         allData={allData}
         data={data}
         navigation={navigation}
-        refreshData={refreshData}
         naviMapInfo={naviMapInfo}
-        setStatusValue={setStatusValue}
+        queryKey="getPlaceBacklogs"
       />
-    </View>
+    </Layout>
   );
 };
 
 const styles = StyleSheet.create({
+  layoutContainer: {
+    height: '100%',
+  },
   image: {
     width: 80,
     height: 80,

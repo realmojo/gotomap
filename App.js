@@ -11,7 +11,6 @@ import {
 import useStore from './stores';
 import {observer} from 'mobx-react';
 import {QueryClient, QueryClientProvider} from 'react-query';
-import {Test} from './screens';
 const queryClient = new QueryClient();
 
 const Stack = createStackNavigator();

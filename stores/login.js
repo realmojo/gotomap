@@ -18,8 +18,7 @@ const loginStore = observable({
           this.userInfo = user;
         });
       } catch (e) {
-        console.log('user info error');
-        console.log(e);
+        console.log(`user info error: ${e}`);
       }
     }
   },

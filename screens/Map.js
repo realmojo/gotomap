@@ -148,10 +148,10 @@ export const Map = () => {
 
   return (
     <Layout style={{flex: 1, flexDirection: 'column'}} level="1">
-      <Layout style={styles.layout} level="4">
+      <Layout style={styles.layout} level="1">
         <Input
           style={styles.searchInput}
-          placeholder="가고 싶었던 곳을 검색하세요"
+          placeholder="가보고 싶었던 곳을 검색하세요"
           value={value}
           status="warning"
           // onFocus={() => doFocus()}

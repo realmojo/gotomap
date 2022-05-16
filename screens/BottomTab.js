@@ -1,12 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-// import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-
 import {PlaceBacklog, PlaceDone, Map, My} from './index';
 
 const Tab = createMaterialTopTabNavigator();
-// const Tab = createMaterialBottomTabNavigator();
 
 export const BottomTab = () => {
   return (
@@ -25,9 +22,10 @@ export const BottomTab = () => {
         name="Map"
         component={Map}
         options={{
+          lazy: true,
           tabBarLabel: '검색',
           tabBarIcon: ({color}) => (
-            <MaterialCommunityIcons name="magnify" color={color} size={20} />
+            <MaterialCommunityIcons name="magnify" color={color} size={26} />
           ),
         }}
       />
@@ -35,12 +33,13 @@ export const BottomTab = () => {
         name="PlaceBacklog"
         component={PlaceBacklog}
         options={{
+          lazy: true,
           tabBarLabel: '가봐야지',
           tabBarIcon: ({color}) => (
             <MaterialCommunityIcons
               name="map-marker-outline"
               color={color}
-              size={20}
+              size={26}
             />
           ),
         }}
@@ -49,9 +48,10 @@ export const BottomTab = () => {
         name="PlaceDone"
         component={PlaceDone}
         options={{
+          lazy: true,
           tabBarLabel: '가봤지',
           tabBarIcon: ({color}) => (
-            <MaterialCommunityIcons name="map-marker" color={color} size={20} />
+            <MaterialCommunityIcons name="map-marker" color={color} size={26} />
           ),
         }}
       />
@@ -59,12 +59,13 @@ export const BottomTab = () => {
         name="My"
         component={My}
         options={{
+          lazy: true,
           tabBarLabel: '설정',
           tabBarIcon: ({color}) => (
             <MaterialCommunityIcons
               name="cog-outline"
               color={color}
-              size={20}
+              size={26}
             />
           ),
         }}
