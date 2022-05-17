@@ -2,7 +2,7 @@ import React, {useState, useRef} from 'react';
 import {StyleSheet, View} from 'react-native';
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
-import {PlaceDetail} from '../components';
+import {PlaceDetail} from '.';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
 import {Layout, Button} from '@ui-kitten/components';
 

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {LoadingIndicator, PlaceDetailText} from '../components';
+import {LoadingIndicator, PlaceDetailText} from '.';
 import {addPlace} from '../api';
 import {PLACE_STATUS} from '../config/constants';
 import {
@@ -105,7 +105,9 @@ export const MapDetail = ({searchItem}) => {
 
     try {
       placeStore.setForceRefresh(true);
-      addMutation.mutate(params);
+      setTimeout(() => {
+        addMutation.mutate(params);
+      }, 10);
       setIsGo(!isGo);
     } catch (e) {
       console.log(e);

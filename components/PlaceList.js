@@ -47,7 +47,7 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     placeStore.setForceRefresh(true);
-    queryClient.refetchQueries(queryKey);
+    queryClient.invalidateQueries(queryKey);
     setSelectedSido(SIDO[0]);
     setSelectedSigungu(defaultSigungu);
     wait(1000).then(() => {

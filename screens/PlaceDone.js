@@ -34,7 +34,7 @@ export const PlaceDone = ({navigation}) => {
           setAllData(items);
           placeStore.setForceRefresh(false);
         }
-        console.log('getPlaceDones getPlaces reload');
+        console.log('getPlaceDones reload');
       },
       onError: () => {
         console.log('getPlaceDones failed');

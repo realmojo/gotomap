@@ -1,4 +1,4 @@
-import {observable, runInAction} from 'mobx';
+import {observable} from 'mobx';
 
 const tabStore = observable({
   tabCount: 0,

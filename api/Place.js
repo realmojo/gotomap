@@ -17,6 +17,21 @@ const getPlace = id => {
   });
 };
 
+const getPlaces = () => {
+  console.log(`getPlaces Api`);
+  const userId = userStore.userId;
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`${API_URL}/place/all?userId=${userId}`)
+      .then(res => {
+        resolve(res.data);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
 const addPlace = params => {
   return new Promise((resolve, reject) => {
     axios
@@ -107,6 +122,7 @@ const removePlace = _id => {
 export {
   addPlace,
   getPlace,
+  getPlaces,
   getPlaceByStatus,
   getPlaceCount,
   updatePlaceStatus,

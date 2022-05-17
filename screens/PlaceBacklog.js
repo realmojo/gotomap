@@ -34,7 +34,7 @@ export const PlaceBacklog = ({navigation}) => {
           setAllData(items);
           placeStore.setForceRefresh(false);
         }
-        console.log('getPlaceBacklogs getPlaces reload');
+        console.log('getPlaceBacklogs reload');
       },
       onError: () => {
         console.log('getPlaceBacklogs failed');

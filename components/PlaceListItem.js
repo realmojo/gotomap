@@ -12,7 +12,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PLACE_STATUS} from '../config/constants';
 import {TextDetail} from './index';
-import {updatePlaceStatus, updatePlaceMemo, removePlace} from '../api';
+import {updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
 
 const removeIcon = props => <Icon {...props} name="trash-2-outline" />;
@@ -22,6 +22,8 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
   const {fullAddress, latitude, longitude, memo} = item.item;
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
+
+  console.log('PlaceList Item');
 
   const doDelete = (title, _id) => {
     Alert.alert(
@@ -52,13 +54,6 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
     doUpdatePlaceMemo({_id, memo: value});
   };
 
-  // const doUpdatePlaceStatus = useCallback(
-  //   params => {
-  //     updateMutation.mutate(params);
-  //   },
-  //   [updateMutation],
-  // );
-
   const doDeletePlace = useCallback(
     params => {
       deleteMutation.mutate(params);
@@ -85,20 +80,6 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
       });
 
       return previousValue;
-      // const previous = queryClient.getQueryData(queryKey);
-      // console.log(previous.length);
-      // const newData = previous.map(place => {
-      //   if (place._id === item._id) {
-      //     place.memo = item.memo;
-      //   }
-      //   // const findIndex = places.findIndex(place => {
-      //   //   return place._id === item._id;
-      //   // });
-      //   // if (findIndex) {
-      //   // }
-      //   return place;
-      // });
-      // queryClient.setQueryData(queryKey, newData);
     },
   });
 
@@ -114,33 +95,20 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
     },
   });
 
-  // const updateMutation = useMutation(params => updatePlaceStatus(params), {
-  //   onMutate: item => {
-  //     const previousValue = queryClient.setQueryData('getPlaces', places => {
-  //       const findIndex = places.findIndex(place => {
-  //         return place._id === item._id;
-  //       });
-  //       places[findIndex].status = item.status;
-  //       return places;
-  //     });
-  //     return previousValue;
-  //   },
-  // });
-
   const renderItemHeader = item => {
     const {_id, title, category, imageURL, status} = item;
     return (
       <ListItem
         title={() => (
-          <View style={{flexDirection: 'row'}}>
-            <Text style={{paddingLeft: 8}} category="p2">
+          <View style={styles.itemHeader}>
+            <Text style={styles.itemHeaderTitle} category="p2">
               {title}
             </Text>
             {status === PLACE_STATUS.DONE && (
               <MaterialCommunityIcons
-                style={{paddingLeft: 4, paddingTop: 1}}
+                style={styles.itemHeaderIcon}
                 name="check-circle"
-                color="#ffaa00"
+                color="#00C2CB"
                 size={16}
               />
             )}
@@ -155,35 +123,17 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
         }}
         accessoryLeft={() => (
           <Avatar
-            style={{marginLeft: 10}}
+            style={styles.emptyLogo}
             source={
-              imageURL ? {uri: imageURL} : require('../assets/images/logo.png')
+              imageURL
+                ? {uri: imageURL}
+                : queryKey === 'getPlaceBacklogs'
+                ? require('../assets/images/logo.png')
+                : require('../assets/images/logo-done.png')
             }
           />
         )}
         accessoryRight={() => (
-          // {/* <Button
-          //   style={{marginRight: 10}}
-          //   size="tiny"
-          //   appearance={
-          //     status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'
-          //   }
-          //   onPress={() =>
-          //     doUpdatePlaceStatus({
-          //       _id,
-          //       status:
-          //         status === PLACE_STATUS.BACKLOG
-          //           ? PLACE_STATUS.DONE
-          //           : PLACE_STATUS.BACKLOG,
-          //     })
-          //   }
-          //   status="warning">
-          //   <Text style={{fontSize: 19}}>
-          //     {status === PLACE_STATUS.BACKLOG
-          //       ? PLACE_STATUS_KR.BACKLOG
-          //       : PLACE_STATUS_KR.DONE}
-          //   </Text>
-          // </Button> */}
           <Button
             size="small"
             appearance="ghost"
@@ -197,7 +147,6 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
   };
   return useMemo(
     () => (
-      // return (
       <View>
         <Card
           style={styles.item}
@@ -212,18 +161,18 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
           {isMemoInput ? (
             <>
               <Input
-                style={{padding: 10}}
+                style={styles.input}
                 placeholder="입력하고 싶은 내용을 적어주세요"
                 size="medium"
                 status="warning"
                 multiline={true}
-                textStyle={{minHeight: 64}}
+                textStyle={{minHeight: 40}}
                 value={value}
-                onBlur={() => doSave(item.item._id)}
+                // onBlur={() => doSave(item.item._id)}
                 onChangeText={nextValue => setValue(nextValue)}
               />
               <Button
-                style={{marginHorizontal: 10}}
+                style={styles.saveButton}
                 size="small"
                 status="warning"
                 onPress={() => doSave(item.item._id)}>
@@ -248,8 +197,18 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
 };
 
 const styles = StyleSheet.create({
+  itemHeader: {flexDirection: 'row'},
+  itemHeaderTitle: {paddingLeft: 8},
+  itemHeaderIcon: {paddingLeft: 4, paddingTop: 1},
+  emptyLogo: {marginLeft: 10},
   item: {
     marginVertical: 4,
+  },
+  saveButton: {
+    marginHorizontal: 10,
+  },
+  input: {
+    padding: 10,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useCallback, useRef, useEffect} from 'react';
 import NaverMapView, {Marker} from 'react-native-nmap';
 import {
   View,
@@ -16,72 +16,47 @@ import {
   ListItem,
 } from '@ui-kitten/components';
 import {debounce} from 'lodash';
-import {getMapDetailInfo, getSearchPlaces} from '../api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getMapDetailInfo, getSearchPlaces, getPlaces} from '../api';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
-import {MapDetail} from './MapDetail';
+import {useQuery} from 'react-query';
+import {PLACE_STATUS} from '../config/constants';
+import {MapDetail, PlaceDetail} from '../components';
 
-export const Map = () => {
+export const Map = ({navigation}) => {
   const bottomSheet = useRef();
+  const bottomSheetDetail = useRef();
   const [value, setValue] = useState('');
   const [id, setId] = useState(0);
   const [searchItem, setSearchItem] = useState({});
+  const [placeItem, setPlaceItem] = useState({});
   const [places, setPlaces] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
-  const [historyWord, setHistoryWord] = useState([]);
-  // const [isFocus, setIsFocus] = useState(false);
   const [coordinate, setCoordinate] = useState({
     latitude: 37.5632555012193,
     longitude: 126.97601589994,
   });
 
+  const {data} = useQuery('getPlaces', () => getPlaces(), {
+    onSuccess: () => {
+      console.log('getPlaces reload');
+    },
+    onError: () => {
+      console.log('getPlaces failed');
+    },
+  });
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabLongPress', e => {
+      console.log('데이터를 새로 가져옵니다.');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const doClose = () => {
     setValue('');
-    // setIsFocus(false);
     setPlaces([]);
   };
-
-  // const doFocus = async () => {
-  //   const words = await getHistoryWords();
-  //   setHistoryWord(words);
-  //   setIsFocus(true);
-  // };
-
-  // const removeWord = async id => {
-  //   const words = await getHistoryWords();
-  //   const filterWords = words.filter(item => item.id !== id);
-  //   AsyncStorage.setItem('words', JSON.stringify(filterWords));
-  //   setHistoryWord(filterWords);
-  // };
-
-  // AsyncStorage.removeItem('words');
-
-  // const wordRenderItem = item => {
-  //   const {id, title, latitude, longitude} = item.item;
-  //   if (id) {
-  //     return (
-  //       <ListItem
-  //         style={{height: 40}}
-  //         title={title}
-  //         onPress={() => placeClick(id, latitude, longitude, title, true)}
-  //         accessoryRight={() => (
-  //           <Button
-  //             status="basic"
-  //             size="small"
-  //             appearance="ghost"
-  //             onPress={() => removeWord(id)}
-  //             accessoryLeft={removeIcon}
-  //           />
-  //         )}
-  //       />
-  //     );
-  //   }
-  // };
-
-  // const getHistoryWords = async () => {
-  //   const words = await AsyncStorage.getItem('words');
-  //   return words ? JSON.parse(words) : [];
-  // };
 
   const placeClick = async (id, latitude, longitude, title) => {
     setId(id);
@@ -94,16 +69,6 @@ export const Map = () => {
     setPlaces([]);
     const placeItem = await getMapDetailInfo(id);
     setSearchItem(placeItem);
-    // if (!isWordClick) {
-    //   const words = await getHistoryWords();
-    //   words.push({
-    //     id,
-    //     title,
-    //     longitude,
-    //     latitude,
-    //   });
-    //   AsyncStorage.setItem('words', JSON.stringify(words));
-    // }
     doClose();
   };
 
@@ -122,7 +87,6 @@ export const Map = () => {
 
   const doSearch = useCallback(
     debounce(async value => {
-      setHistoryWord([]);
       setIsSearch(true);
       if (value === '') {
         setPlaces([]);
@@ -146,6 +110,11 @@ export const Map = () => {
     bottomSheet.current.show();
   };
 
+  const doPlaceDetail = item => {
+    setPlaceItem(item);
+    bottomSheetDetail.current.show();
+  };
+
   return (
     <Layout style={{flex: 1, flexDirection: 'column'}} level="1">
       <Layout style={styles.layout} level="1">
@@ -165,22 +134,6 @@ export const Map = () => {
             )
           }
         />
-        {/* {isFocus && historyWord.length > 0 && (
-          <>
-            <FlatList
-              style={styles.container}
-              data={historyWord}
-              ItemSeparatorComponent={Divider}
-              renderItem={wordRenderItem}
-              keyExtractor={(item, index) => index.toString()}
-            />
-            <Text
-              style={{padding: 4, color: 'black'}}
-              onPress={() => doClose()}>
-              닫기
-            </Text>
-          </>
-        )} */}
         {places.length > 0 && (
           <>
             <List
@@ -202,14 +155,38 @@ export const Map = () => {
           {id !== 0 ? (
             <Marker
               coordinate={coordinate}
-              pinColor="blue"
+              pinColor="red"
               onClick={() => doMapDetail()}
             />
           ) : null}
+          {data !== undefined &&
+            data.length > 0 &&
+            data.map((item, index) => (
+              <Marker
+                key={index}
+                caption={{
+                  text: item.title,
+                  color: '#ffaa00',
+                  haloColor: '#000',
+                  textSize: 12,
+                }}
+                coordinate={{
+                  longitude: item.longitude,
+                  latitude: item.latitude,
+                }}
+                pinColor={item.status === PLACE_STATUS.BACKLOG ? 'red' : 'blue'}
+                onClick={() => {
+                  doPlaceDetail(item);
+                }}
+              />
+            ))}
         </NaverMapView>
       </View>
       <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
         <MapDetail searchItem={searchItem} />
+      </BottomSheet>
+      <BottomSheet hasDraggableIcon ref={bottomSheetDetail} height={600}>
+        <PlaceDetail placeItem={placeItem} queryKey="getPlaces" />
       </BottomSheet>
     </Layout>
   );
