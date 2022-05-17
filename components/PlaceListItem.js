@@ -19,11 +19,9 @@ const removeIcon = props => <Icon {...props} name="trash-2-outline" />;
 
 const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
   const queryClient = useQueryClient();
-  const {fullAddress, latitude, longitude, memo} = item.item;
+  const {fullAddress, latitude, longitude, memo, title, status} = item.item;
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
-
-  console.log('PlaceList Item');
 
   const doDelete = (title, _id) => {
     Alert.alert(
@@ -192,7 +190,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
         </Card>
       </View>
     ),
-    [item.item.status, item.item.memo, isMemoInput, value],
+    [item.item, memo, status, isMemoInput, value],
   );
 };
 

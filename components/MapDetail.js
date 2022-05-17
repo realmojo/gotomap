@@ -57,6 +57,7 @@ export const MapDetail = ({searchItem}) => {
 
   const addMutation = useMutation(addPlace, {
     onSuccess: () => {
+      queryClient.invalidateQueries('getPlaces');
       queryClient.invalidateQueries('getPlaceBacklogs');
     },
   });
@@ -100,7 +101,8 @@ export const MapDetail = ({searchItem}) => {
       memo: '',
       sido,
       sigungu,
-      regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
+      created: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updated: moment().format('YYYY-MM-DD HH:mm:ss'),
     };
 
     try {

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Text, Avatar, TopNavigation} from '@ui-kitten/components';
+import {Text, Avatar, TopNavigation, Layout} from '@ui-kitten/components';
 import {getPlaceByStatus} from '../api';
 import {PlaceList, LoadingIndicator, Error} from '../components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
@@ -59,7 +59,7 @@ export const PlaceDone = ({navigation}) => {
   }
 
   return (
-    <View>
+    <Layout level="2" style={styles.layoutContainer}>
       <TopNavigation title={renderTitle} />
       <PlaceList
         allData={allData}
@@ -68,11 +68,14 @@ export const PlaceDone = ({navigation}) => {
         naviMapInfo={naviMapInfo}
         queryKey="getPlaceDones"
       />
-    </View>
+    </Layout>
   );
 };
 
 const styles = StyleSheet.create({
+  layoutContainer: {
+    height: '100%',
+  },
   image: {
     width: 80,
     height: 80,

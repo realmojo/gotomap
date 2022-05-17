@@ -16,7 +16,7 @@ const addUser = params => {
     id: params.id,
     name: params.properties.nickname,
     profileImage: params.properties.profile_image,
-    regdate: moment().format('YYYY-MM-DD HH:mm:ss'),
+    created: moment().format('YYYY-MM-DD HH:mm:ss'),
   };
   return new Promise((resolve, reject) => {
     axios

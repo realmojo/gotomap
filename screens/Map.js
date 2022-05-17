@@ -6,6 +6,7 @@ import {
   Dimensions,
   StyleSheet,
   TouchableWithoutFeedback,
+  ToastAndroid,
 } from 'react-native';
 import {
   List,
@@ -18,11 +19,12 @@ import {
 import {debounce} from 'lodash';
 import {getMapDetailInfo, getSearchPlaces, getPlaces} from '../api';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
-import {useQuery} from 'react-query';
+import {useQueryClient, useQuery} from 'react-query';
 import {PLACE_STATUS} from '../config/constants';
 import {MapDetail, PlaceDetail} from '../components';
 
 export const Map = ({navigation}) => {
+  const queryClient = useQueryClient();
   const bottomSheet = useRef();
   const bottomSheetDetail = useRef();
   const [value, setValue] = useState('');
@@ -39,6 +41,7 @@ export const Map = ({navigation}) => {
   const {data} = useQuery('getPlaces', () => getPlaces(), {
     onSuccess: () => {
       console.log('getPlaces reload');
+      setId(0);
     },
     onError: () => {
       console.log('getPlaces failed');
@@ -46,8 +49,9 @@ export const Map = ({navigation}) => {
   });
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('tabLongPress', e => {
-      console.log('데이터를 새로 가져옵니다.');
+    const unsubscribe = navigation.addListener('tabLongPress', () => {
+      queryClient.invalidateQueries('getPlaces');
+      ToastAndroid.show('데이터를 새로 가져옵니다.', ToastAndroid.SHORT);
     });
 
     return unsubscribe;
@@ -123,7 +127,6 @@ export const Map = ({navigation}) => {
           placeholder="가보고 싶었던 곳을 검색하세요"
           value={value}
           status="warning"
-          // onFocus={() => doFocus()}
           onChangeText={text => onDebounceChange(text)}
           size="large"
           accessoryRight={() =>
@@ -155,7 +158,7 @@ export const Map = ({navigation}) => {
           {id !== 0 ? (
             <Marker
               coordinate={coordinate}
-              pinColor="red"
+              pinColor="green"
               onClick={() => doMapDetail()}
             />
           ) : null}

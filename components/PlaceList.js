@@ -2,6 +2,7 @@ import React, {useState, useCallback, useMemo, useRef} from 'react';
 import {StyleSheet, View, RefreshControl, ScrollView} from 'react-native';
 import {
   List,
+  Text,
   Layout,
   Select,
   IndexPath,
@@ -35,6 +36,7 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
   const [sigunguOptions, setSigunguOptions] = useState([]);
 
   console.log('Place list');
+
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
@@ -101,6 +103,7 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
   return useMemo(
     () => (
       <View>
+        <Text style={styles.none}>{data.length}</Text>
         <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
           <PlaceDetail placeItem={placeItem} queryKey={queryKey} />
         </BottomSheet>
@@ -153,16 +156,21 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
       </View>
     ),
     [
+      data,
       data.length,
       selectedSido.name_kr,
       selectedSigungu.name_kr,
-      placeItem.status,
+      placeItem,
       placeItem.memo,
+      placeItem.status,
       refreshing,
     ],
   );
 };
 const styles = StyleSheet.create({
+  none: {
+    display: 'none',
+  },
   image: {
     width: '100%',
     height: 200,
@@ -196,7 +204,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 8,
-    paddingBottom: 224,
+    paddingBottom: 114,
   },
   item: {
     marginVertical: 4,

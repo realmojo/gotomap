@@ -25,7 +25,7 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
     fullAddress,
     fullRoadAddress,
     phone,
-    regdate,
+    created,
     description,
     options,
     keywords,
@@ -181,11 +181,11 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
               }}
             />
           )}
-          {isEmpty(regdate) && (
+          {isEmpty(created) && (
             <PlaceDetailText
               iconName="check"
               category="등록날짜"
-              title={regdate}
+              title={created}
             />
           )}
         </Layout>
