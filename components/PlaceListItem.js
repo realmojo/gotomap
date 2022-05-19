@@ -91,6 +91,9 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
       });
       return previosValue;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries('getPlaceCount');
+    },
   });
 
   const renderItemHeader = item => {

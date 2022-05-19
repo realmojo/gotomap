@@ -1,25 +1,37 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {StyleSheet, View, Linking, Image} from 'react-native';
 import {Layout, Text, ListItem, Divider} from '@ui-kitten/components';
 import useStore from '../stores';
 import {observer} from 'mobx-react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useQuery} from 'react-query';
+import {LoadingIndicator} from '../components';
+import {getPlaceCount} from '../api';
 
 const removeId = async () => {
   await AsyncStorage.removeItem('id');
 };
 
 export const My = observer(() => {
-  const {loginStore, userStore} = useStore();
+  const {loginStore} = useStore();
   const {name, profileImage} = loginStore.userInfo;
   const doLogout = async () => {
     await removeId();
     loginStore.setIslogin(false);
   };
 
-  useEffect(() => {
-    userStore.getPlaceCount();
-  }, []);
+  const {isLoading, data} = useQuery('getPlaceCount', () => getPlaceCount(), {
+    onSuccess: () => {
+      console.log('getPlaceCount success');
+    },
+    onError: () => {
+      console.log('getPlaceCount failed');
+    },
+  });
+
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <Layout level="2">
@@ -39,19 +51,22 @@ export const My = observer(() => {
           <View style={styles.countWrap}>
             <Text style={styles.countTitle}>전체</Text>
             <Text style={styles.countText}>
-              {userStore.countInfo.totalCount}
+              {data.totalCount}
+              {/* {userStore.countInfo.totalCount} */}
             </Text>
           </View>
           <View style={styles.countWrap}>
             <Text style={styles.countTitle}>가봤지</Text>
             <Text style={styles.countText}>
-              {userStore.countInfo.doneCount}
+              {data.doneCount}
+              {/* {userStore.countInfo.doneCount} */}
             </Text>
           </View>
           <View style={styles.countWrap}>
             <Text style={styles.countTitle}>가봐야지</Text>
             <Text style={styles.countText}>
-              {userStore.countInfo.backlogCount}
+              {data.backlogCount}
+              {/* {userStore.countInfo.backlogCount} */}
             </Text>
           </View>
         </Layout>

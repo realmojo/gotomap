@@ -18,7 +18,6 @@ const getPlace = id => {
 };
 
 const getPlaces = () => {
-  console.log(`getPlaces Api`);
   const userId = userStore.userId;
   return new Promise((resolve, reject) => {
     axios
@@ -76,7 +75,6 @@ const updatePlaceMemo = async ({_id, memo}) => {
 };
 
 const getPlaceByStatus = status => {
-  console.log(`getPlace ${status} Api`);
   const userId = userStore.userId;
   if (userId) {
     return new Promise((resolve, reject) => {

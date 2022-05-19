@@ -1,13 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {
-  Text,
-  Avatar,
-  TopNavigation,
-  Layout,
-  TopNavigationAction,
-  Icon,
-} from '@ui-kitten/components';
+import {Text, Avatar, Layout, TopNavigation} from '@ui-kitten/components';
 import {getPlaceByStatus} from '../api';
 import {PlaceList, LoadingIndicator, Error} from '../components';
 import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
@@ -16,7 +9,6 @@ import useStore from '../stores';
 
 export const PlaceBacklog = ({navigation}) => {
   const [allData, setAllData] = useState([]);
-  const [isFold, setIsFold] = useState(false);
   const {placeStore} = useStore();
   const renderTitle = props => (
     <View style={styles.titleContainer}>

@@ -79,13 +79,21 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
     {
       onMutate: item => {
         const previousValue = queryClient.setQueryData(queryKey, places => {
-          const findIndex = places.findIndex(place => {
-            return place._id === item._id;
+          const filterPlace = places.filter(place => {
+            return place._id !== item._id;
           });
-          places[findIndex].status = item.status;
-          return places;
+          return filterPlace;
         });
+
         return previousValue;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries('getPlaceCount');
+        if (queryKey === 'getPlaceBacklogs') {
+          queryClient.invalidateQueries('getPlaceDones');
+        } else if (queryKey === 'getPlaceDones') {
+          queryClient.invalidateQueries('getPlaceBacklogs');
+        }
       },
     },
   );

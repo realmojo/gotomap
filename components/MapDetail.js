@@ -59,6 +59,7 @@ export const MapDetail = ({searchItem}) => {
     onSuccess: () => {
       queryClient.invalidateQueries('getPlaces');
       queryClient.invalidateQueries('getPlaceBacklogs');
+      queryClient.invalidateQueries('getPlaceCount');
     },
   });
 

@@ -185,10 +185,18 @@ export const Map = ({navigation}) => {
             ))}
         </NaverMapView>
       </View>
-      <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
+      <BottomSheet
+        hasDraggableIcon
+        ref={bottomSheet}
+        onRequestClose={() => bottomSheet.current.close()}
+        height={600}>
         <MapDetail searchItem={searchItem} />
       </BottomSheet>
-      <BottomSheet hasDraggableIcon ref={bottomSheetDetail} height={600}>
+      <BottomSheet
+        hasDraggableIcon
+        ref={bottomSheetDetail}
+        onRequestClose={() => bottomSheetDetail.current.close()}
+        height={600}>
         <PlaceDetail placeItem={placeItem} queryKey="getPlaces" />
       </BottomSheet>
     </Layout>

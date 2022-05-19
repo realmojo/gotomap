@@ -35,8 +35,6 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
   );
   const [sigunguOptions, setSigunguOptions] = useState([]);
 
-  console.log('Place list');
-
   const wait = timeout => {
     return new Promise(resolve => setTimeout(resolve, timeout));
   };
@@ -104,7 +102,12 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
     () => (
       <View>
         <Text style={styles.none}>{data.length}</Text>
-        <BottomSheet hasDraggableIcon ref={bottomSheet} height={600}>
+        <BottomSheet
+          hasDraggableIcon
+          onRequestClose={() => bottomSheet.current.close()}
+          // onClose
+          ref={bottomSheet}
+          height={600}>
           <PlaceDetail placeItem={placeItem} queryKey={queryKey} />
         </BottomSheet>
         <Layout style={styles.layoutContainer} level="2">
@@ -150,7 +153,7 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }>
-            <Nothing navigation={navigation} />
+            <Nothing navigation={navigation} queryKey={queryKey} />
           </ScrollView>
         )}
       </View>
