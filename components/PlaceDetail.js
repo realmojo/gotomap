@@ -92,6 +92,14 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
         } else if (queryKey === QUERY_KEY.DONE) {
           setForceStatusAppearance('outline');
           setForceStatusText('backlog');
+        } else if (queryKey === QUERY_KEY.ALL) {
+          if (item.status === PLACE_STATUS.BACKLOG) {
+            setForceStatusAppearance('outline');
+            setForceStatusText('backlog');
+          } else {
+            setForceStatusAppearance('filled');
+            setForceStatusText('done');
+          }
         }
 
         const previousValue = queryClient.setQueryData(queryKey, places => {
@@ -104,7 +112,8 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
         return previousValue;
       },
       onSuccess: item => {
-        queryClient.invalidateQueries(QUERY_KEY.PLACE_COUNT, placeCount => {
+        queryClient.invalidateQueries(QUERY_KEY.ALL);
+        queryClient.setQueryData(QUERY_KEY.PLACE_COUNT, placeCount => {
           const {totalCount, backlogCount, doneCount} = placeCount;
           return {
             totalCount,
@@ -116,11 +125,13 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
               queryKey === QUERY_KEY.BACKLOG ? doneCount + 1 : doneCount - 1,
           };
         });
-        if (queryKey === QUERY_KEY.BACKLOG) {
+        // if (queryKey === QUERY_KEY.BACKLOG || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.DONE)) {
+        if (item.status === PLACE_STATUS.DONE) {
           queryClient.setQueryData(QUERY_KEY.DONE, places => {
             return [item, ...places];
           });
-        } else if (queryKey === QUERY_KEY.DONE) {
+          // } else if (queryKey === QUERY_KEY.DONE || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.BACKLOG)) {
+        } else if (item.status === PLACE_STATUS.BACKLOG) {
           queryClient.setQueryData(QUERY_KEY.BACKLOG, places => {
             return [item, ...places];
           });

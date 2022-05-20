@@ -68,16 +68,17 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
 
   const updateMutationMemo = useMutation(params => updatePlaceMemo(params), {
     onMutate: item => {
-      const previousValue = queryClient.getQueryData(queryKey);
-      queryClient.setQueryData(queryKey, places => {
+      const previousValue = queryClient.setQueryData(queryKey, places => {
         const findIndex = places.findIndex(place => {
           return place._id === item._id;
         });
         places[findIndex].memo = item.memo;
         return places;
       });
-
       return previousValue;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(QUERY_KEY.ALL);
     },
   });
 

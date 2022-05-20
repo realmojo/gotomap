@@ -31,7 +31,7 @@ export const PlaceBacklog = ({navigation}) => {
             `${QUERY_KEY.BACKLOG} items all loading: `,
             items ? items.length : '',
           );
-          setAllData(items);
+          setAllData(items ? items : []);
           placeStore.setForceRefresh(false);
         }
         console.log(`${QUERY_KEY.BACKLOG} reload`);
