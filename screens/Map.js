@@ -20,7 +20,7 @@ import {debounce} from 'lodash';
 import {getMapDetailInfo, getSearchPlaces, getPlaces} from '../api';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
 import {useQueryClient, useQuery} from 'react-query';
-import {PLACE_STATUS} from '../config/constants';
+import {PLACE_STATUS, QUERY_KEY} from '../config/constants';
 import {MapDetail, PlaceDetail} from '../components';
 
 export const Map = ({navigation}) => {
@@ -38,19 +38,19 @@ export const Map = ({navigation}) => {
     longitude: 126.97601589994,
   });
 
-  const {data} = useQuery('getPlaces', () => getPlaces(), {
+  const {data} = useQuery(QUERY_KEY.ALL, () => getPlaces(), {
     onSuccess: () => {
-      console.log('getPlaces reload');
+      console.log(`${QUERY_KEY.ALL} reload`);
       setId(0);
     },
     onError: () => {
-      console.log('getPlaces failed');
+      console.log(`${QUERY_KEY.ALL} failed`);
     },
   });
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabLongPress', () => {
-      queryClient.invalidateQueries('getPlaces');
+      queryClient.invalidateQueries(QUERY_KEY.ALL);
       ToastAndroid.show('데이터를 새로 가져옵니다.', ToastAndroid.SHORT);
     });
 
@@ -197,7 +197,7 @@ export const Map = ({navigation}) => {
         ref={bottomSheetDetail}
         onRequestClose={() => bottomSheetDetail.current.close()}
         height={600}>
-        <PlaceDetail placeItem={placeItem} queryKey="getPlaces" />
+        <PlaceDetail placeItem={placeItem} queryKey={QUERY_KEY.ALL} />
       </BottomSheet>
     </Layout>
   );

@@ -3,7 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import {Text, Avatar, TopNavigation, Layout} from '@ui-kitten/components';
 import {getPlaceByStatus} from '../api';
 import {PlaceList, LoadingIndicator, Error} from '../components';
-import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
+import {PLACE_STATUS, PLACE_STATUS_KR, QUERY_KEY} from '../config/constants';
 import {useQuery} from 'react-query';
 import useStore from '../stores';
 
@@ -21,23 +21,23 @@ export const PlaceDone = ({navigation}) => {
   );
 
   const {isLoading, data, error} = useQuery(
-    'getPlaceDones',
+    QUERY_KEY.DONE,
     () => getPlaceByStatus(PLACE_STATUS.DONE),
     {
       onSuccess: items => {
         console.log('forceRefresh: ', placeStore.forceRefresh);
         if (placeStore.forceRefresh) {
           console.log(
-            'getPlaceDones items all loading: ',
+            `${QUERY_KEY.DONE} items all loading: `,
             items ? items.length : '',
           );
           setAllData(items);
           placeStore.setForceRefresh(false);
         }
-        console.log('getPlaceDones reload');
+        console.log(`${QUERY_KEY.DONE} reload`);
       },
       onError: () => {
-        console.log('getPlaceDones failed');
+        console.log(`${QUERY_KEY.DONE} failed`);
       },
     },
   );
@@ -66,7 +66,7 @@ export const PlaceDone = ({navigation}) => {
         data={data}
         navigation={navigation}
         naviMapInfo={naviMapInfo}
-        queryKey="getPlaceDones"
+        queryKey={QUERY_KEY.DONE}
       />
     </Layout>
   );

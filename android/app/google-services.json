@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "350541454372",
+    "project_id": "gotomap-32915",
+    "storage_bucket": "gotomap-32915.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350541454372:android:9c826de7bee147eeb3ccb1",
+        "android_client_info": {
+          "package_name": "com.f5game.gotomap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350541454372-u3u3mcbeeb5ack92ea241qo7pa1bceg0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCikX9eyKDw-AI3TKlcdbAb_J28BZjF5UE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350541454372-u3u3mcbeeb5ack92ea241qo7pa1bceg0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

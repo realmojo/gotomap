@@ -10,7 +10,7 @@ import {
   ListItem,
 } from '@ui-kitten/components';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {PLACE_STATUS} from '../config/constants';
+import {PLACE_STATUS, QUERY_KEY} from '../config/constants';
 import {TextDetail} from './index';
 import {updatePlaceMemo, removePlace} from '../api';
 import {useQueryClient, useMutation} from 'react-query';
@@ -92,7 +92,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
       return previosValue;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries('getPlaceCount');
+      queryClient.invalidateQueries(QUERY_KEY.PLACE_COUNT);
     },
   });
 
@@ -128,7 +128,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
             source={
               imageURL
                 ? {uri: imageURL}
-                : queryKey === 'getPlaceBacklogs'
+                : queryKey === QUERY_KEY.BACKLOG
                 ? require('../assets/images/logo.png')
                 : require('../assets/images/logo-done.png')
             }

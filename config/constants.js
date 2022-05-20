@@ -1,3 +1,10 @@
+export const QUERY_KEY = {
+  BACKLOG: 'getPlaceBacklogs',
+  DONE: 'getPlaceDones',
+  PLACE_COUNT: 'getPlaceCount',
+  ALL: 'getPlaces',
+};
+
 export const PLACE_STATUS = {
   ALL: 'all',
   BACKLOG: 'backlog',

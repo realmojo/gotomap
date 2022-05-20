@@ -34,6 +34,7 @@ export const BottomTab = () => {
         component={PlaceBacklog}
         options={{
           lazy: true,
+          lazyPreloadDistance: 1,
           tabBarLabel: '가봐야지',
           tabBarIcon: ({color}) => (
             <MaterialCommunityIcons
@@ -49,6 +50,7 @@ export const BottomTab = () => {
         component={PlaceDone}
         options={{
           lazy: true,
+          lazyPreloadDistance: 1,
           tabBarLabel: '가봤지',
           tabBarIcon: ({color}) => (
             <MaterialCommunityIcons name="map-marker" color={color} size={26} />

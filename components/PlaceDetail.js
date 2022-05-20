@@ -11,7 +11,7 @@ import {
   Layout,
   ListItem,
 } from '@ui-kitten/components';
-import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
+import {PLACE_STATUS, PLACE_STATUS_KR, QUERY_KEY} from '../config/constants';
 import {useQueryClient, useMutation} from 'react-query';
 import {Category, Title} from '../utils';
 
@@ -37,6 +37,8 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
   const [isMemoInput, setIsMemoInput] = useState(false);
   const [value, setValue] = useState('');
   const [stateMemo, setStateMemo] = useState('');
+  const [forceStatusText, setForceStatusText] = useState('');
+  const [forceStatusAppearance, setForceStatusAppearance] = useState('');
 
   useEffect(() => {
     setStateMemo(memo);
@@ -78,6 +80,20 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
     params => updatePlaceStatus(params),
     {
       onMutate: item => {
+        if (forceStatusText === 'done') {
+          queryKey = QUERY_KEY.DONE;
+        } else if (forceStatusText === 'backlog') {
+          queryKey = QUERY_KEY.BACKLOG;
+        }
+
+        if (queryKey === QUERY_KEY.BACKLOG) {
+          setForceStatusAppearance('filled');
+          setForceStatusText('done');
+        } else if (queryKey === QUERY_KEY.DONE) {
+          setForceStatusAppearance('outline');
+          setForceStatusText('backlog');
+        }
+
         const previousValue = queryClient.setQueryData(queryKey, places => {
           const filterPlace = places.filter(place => {
             return place._id !== item._id;
@@ -87,12 +103,27 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
 
         return previousValue;
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries('getPlaceCount');
-        if (queryKey === 'getPlaceBacklogs') {
-          queryClient.invalidateQueries('getPlaceDones');
-        } else if (queryKey === 'getPlaceDones') {
-          queryClient.invalidateQueries('getPlaceBacklogs');
+      onSuccess: item => {
+        queryClient.invalidateQueries(QUERY_KEY.PLACE_COUNT, placeCount => {
+          const {totalCount, backlogCount, doneCount} = placeCount;
+          return {
+            totalCount,
+            backlogCount:
+              queryKey === QUERY_KEY.BACKLOG
+                ? backlogCount - 1
+                : backlogCount + 1,
+            doneCount:
+              queryKey === QUERY_KEY.BACKLOG ? doneCount + 1 : doneCount - 1,
+          };
+        });
+        if (queryKey === QUERY_KEY.BACKLOG) {
+          queryClient.setQueryData(QUERY_KEY.DONE, places => {
+            return [item, ...places];
+          });
+        } else if (queryKey === QUERY_KEY.DONE) {
+          queryClient.setQueryData(QUERY_KEY.BACKLOG, places => {
+            return [item, ...places];
+          });
         }
       },
     },
@@ -202,19 +233,31 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
         <View style={styles.modalContentFooter}>
           <Button
             size="giant"
-            appearance={status === PLACE_STATUS.BACKLOG ? 'outline' : 'filled'}
+            appearance={
+              forceStatusAppearance
+                ? forceStatusAppearance
+                : status === PLACE_STATUS.BACKLOG
+                ? 'outline'
+                : 'filled'
+            }
             onPress={() =>
               doUpdatePlaceStatus({
                 _id,
                 status:
-                  status === PLACE_STATUS.BACKLOG
+                  forceStatusText === 'done'
+                    ? 'backlog'
+                    : forceStatusText === 'backlog'
+                    ? 'done'
+                    : status === PLACE_STATUS.BACKLOG
                     ? PLACE_STATUS.DONE
                     : PLACE_STATUS.BACKLOG,
               })
             }
             status="warning">
             <Text>
-              {status === PLACE_STATUS.BACKLOG
+              {forceStatusText
+                ? PLACE_STATUS_KR[forceStatusText.toUpperCase()]
+                : status === PLACE_STATUS.BACKLOG
                 ? PLACE_STATUS_KR.BACKLOG
                 : PLACE_STATUS_KR.DONE}
             </Text>

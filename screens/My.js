@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useQuery} from 'react-query';
 import {LoadingIndicator} from '../components';
 import {getPlaceCount} from '../api';
+import {QUERY_KEY} from '../config/constants';
 
 const removeId = async () => {
   await AsyncStorage.removeItem('id');
@@ -20,14 +21,18 @@ export const My = observer(() => {
     loginStore.setIslogin(false);
   };
 
-  const {isLoading, data} = useQuery('getPlaceCount', () => getPlaceCount(), {
-    onSuccess: () => {
-      console.log('getPlaceCount success');
+  const {isLoading, data} = useQuery(
+    QUERY_KEY.PLACE_COUNT,
+    () => getPlaceCount(),
+    {
+      onSuccess: () => {
+        console.log(`${QUERY_KEY.PLACE_COUNT} success`);
+      },
+      onError: () => {
+        console.log(`${QUERY_KEY.PLACE_COUNT} failed`);
+      },
     },
-    onError: () => {
-      console.log('getPlaceCount failed');
-    },
-  });
+  );
 
   if (isLoading) {
     return <LoadingIndicator />;
@@ -50,24 +55,15 @@ export const My = observer(() => {
         <Layout style={styles.countContainer} level="1">
           <View style={styles.countWrap}>
             <Text style={styles.countTitle}>전체</Text>
-            <Text style={styles.countText}>
-              {data.totalCount}
-              {/* {userStore.countInfo.totalCount} */}
-            </Text>
-          </View>
-          <View style={styles.countWrap}>
-            <Text style={styles.countTitle}>가봤지</Text>
-            <Text style={styles.countText}>
-              {data.doneCount}
-              {/* {userStore.countInfo.doneCount} */}
-            </Text>
+            <Text style={styles.countText}>{data.totalCount}</Text>
           </View>
           <View style={styles.countWrap}>
             <Text style={styles.countTitle}>가봐야지</Text>
-            <Text style={styles.countText}>
-              {data.backlogCount}
-              {/* {userStore.countInfo.backlogCount} */}
-            </Text>
+            <Text style={styles.countText}>{data.backlogCount}</Text>
+          </View>
+          <View style={styles.countWrap}>
+            <Text style={styles.countTitle}>가봤지</Text>
+            <Text style={styles.countText}>{data.doneCount}</Text>
           </View>
         </Layout>
       </View>

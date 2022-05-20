@@ -98,14 +98,17 @@ const PlaceList = ({allData, data = [], navigation, naviMapInfo, queryKey}) => {
     filterListData(sigunguOptions[index.row], 'sigungu');
   };
 
+  const doClose = () => {
+    bottomSheet.current.close();
+  };
+
   return useMemo(
     () => (
       <View>
         <Text style={styles.none}>{data.length}</Text>
         <BottomSheet
           hasDraggableIcon
-          onRequestClose={() => bottomSheet.current.close()}
-          // onClose
+          onRequestClose={() => doClose()}
           ref={bottomSheet}
           height={600}>
           <PlaceDetail placeItem={placeItem} queryKey={queryKey} />

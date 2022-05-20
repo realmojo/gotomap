@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {LoadingIndicator, PlaceDetailText} from '.';
 import {addPlace} from '../api';
-import {PLACE_STATUS} from '../config/constants';
+import {PLACE_STATUS, QUERY_KEY} from '../config/constants';
 import {
   Category,
   Title,
@@ -57,9 +57,9 @@ export const MapDetail = ({searchItem}) => {
 
   const addMutation = useMutation(addPlace, {
     onSuccess: () => {
-      queryClient.invalidateQueries('getPlaces');
-      queryClient.invalidateQueries('getPlaceBacklogs');
-      queryClient.invalidateQueries('getPlaceCount');
+      queryClient.invalidateQueries(QUERY_KEY.ALL);
+      queryClient.invalidateQueries(QUERY_KEY.BACKLOG);
+      queryClient.invalidateQueries(QUERY_KEY.PLACE_COUNT);
     },
   });
 

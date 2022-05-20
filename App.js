@@ -1,5 +1,8 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useRef} from 'react';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
@@ -11,6 +14,8 @@ import {
 import useStore from './stores';
 import {observer} from 'mobx-react';
 import {QueryClient, QueryClientProvider} from 'react-query';
+import analytics from '@react-native-firebase/analytics';
+
 const queryClient = new QueryClient();
 
 const Stack = createStackNavigator();
@@ -30,14 +35,6 @@ const TotalStack = observer(() => {
               headerShown: false,
             }}
           />
-          {/* <Stack.Screen
-            name="mapDetail"
-            component={MapDetail}
-            options={{
-              title: '상세정보',
-              cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
-            }}
-          /> */}
           <Stack.Screen
             name="mapInfo"
             component={MapInfo}
@@ -53,12 +50,33 @@ const TotalStack = observer(() => {
 });
 
 export default function App() {
+  const routeNameRef = useRef();
+  const navigationRef = useNavigationContainerRef();
   return (
     <>
       <IconRegistry icons={EvaIconsPack} />
       <QueryClientProvider client={queryClient}>
         <ApplicationProvider {...eva} theme={eva.light}>
-          <NavigationContainer>
+          <NavigationContainer
+            ref={navigationRef}
+            onReady={() => {
+              routeNameRef.current = navigationRef.current.getCurrentRoute()
+                ? navigationRef.current.getCurrentRoute().name
+                : undefined;
+            }}
+            onStateChange={async () => {
+              const previousRouteName = routeNameRef.current;
+              const currentRouteName =
+                navigationRef.current.getCurrentRoute().name;
+
+              if (previousRouteName !== currentRouteName) {
+                await analytics().logScreenView({
+                  screen_name: currentRouteName,
+                  screen_class: currentRouteName,
+                });
+              }
+              routeNameRef.current = currentRouteName;
+            }}>
             <TotalStack />
           </NavigationContainer>
         </ApplicationProvider>

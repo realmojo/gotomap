@@ -3,7 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import {Text, Avatar, Layout, TopNavigation} from '@ui-kitten/components';
 import {getPlaceByStatus} from '../api';
 import {PlaceList, LoadingIndicator, Error} from '../components';
-import {PLACE_STATUS, PLACE_STATUS_KR} from '../config/constants';
+import {PLACE_STATUS, PLACE_STATUS_KR, QUERY_KEY} from '../config/constants';
 import {useQuery} from 'react-query';
 import useStore from '../stores';
 
@@ -21,23 +21,23 @@ export const PlaceBacklog = ({navigation}) => {
   );
 
   const {isLoading, data, error} = useQuery(
-    'getPlaceBacklogs',
+    QUERY_KEY.BACKLOG,
     () => getPlaceByStatus(PLACE_STATUS.BACKLOG),
     {
       onSuccess: items => {
         console.log('forceRefresh: ', placeStore.forceRefresh);
         if (placeStore.forceRefresh) {
           console.log(
-            'getPlaceBacklogs items all loading: ',
+            `${QUERY_KEY.BACKLOG} items all loading: `,
             items ? items.length : '',
           );
           setAllData(items);
           placeStore.setForceRefresh(false);
         }
-        console.log('getPlaceBacklogs reload');
+        console.log(`${QUERY_KEY.BACKLOG} reload`);
       },
       onError: () => {
-        console.log('getPlaceBacklogs failed');
+        console.log(`${QUERY_KEY.BACKLOG} failed`);
       },
     },
   );
@@ -62,7 +62,7 @@ export const PlaceBacklog = ({navigation}) => {
         data={data}
         navigation={navigation}
         naviMapInfo={naviMapInfo}
-        queryKey="getPlaceBacklogs"
+        queryKey={QUERY_KEY.BACKLOG}
       />
     </Layout>
   );
