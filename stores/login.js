@@ -1,5 +1,6 @@
 import {observable, runInAction} from 'mobx';
 import {getKakaoProfile, kakaoLogin, addUser} from '../api';
+import {userStore} from './user';
 
 const loginStore = observable({
   isLogin: false,
@@ -14,8 +15,9 @@ const loginStore = observable({
         const user = await addUser(userInfo);
         runInAction(() => {
           console.log('login success');
-          this.isLogin = true;
           this.userInfo = user;
+          this.isLogin = true;
+          userStore.setId(user.id);
         });
       } catch (e) {
         console.log(`user info error: ${e}`);

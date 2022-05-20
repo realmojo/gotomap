@@ -17,7 +17,6 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 import analytics from '@react-native-firebase/analytics';
 
 const queryClient = new QueryClient();
-
 const Stack = createStackNavigator();
 
 const TotalStack = observer(() => {

@@ -80,9 +80,15 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
     params => updatePlaceStatus(params),
     {
       onMutate: item => {
-        if (forceStatusText === 'done') {
+        if (
+          forceStatusText === 'done' ||
+          (queryKey === QUERY_KEY.ALL && item.status === 'done')
+        ) {
           queryKey = QUERY_KEY.DONE;
-        } else if (forceStatusText === 'backlog') {
+        } else if (
+          forceStatusText === 'backlog' ||
+          (queryKey === QUERY_KEY.ALL && item.status === 'backlog')
+        ) {
           queryKey = QUERY_KEY.BACKLOG;
         }
 

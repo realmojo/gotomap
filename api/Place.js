@@ -81,7 +81,7 @@ const getPlaceByStatus = status => {
       axios
         .get(`${API_URL}/place/all/${status}?userId=${userId}`)
         .then(res => {
-          resolve(res.data);
+          resolve(res.data || []);
         })
         .catch(e => {
           reject(e);

@@ -31,7 +31,7 @@ export const PlaceDone = ({navigation}) => {
             `${QUERY_KEY.DONE} items all loading: `,
             items ? items.length : '',
           );
-          setAllData(items ? items : []);
+          setAllData(items);
           placeStore.setForceRefresh(false);
         }
         console.log(`${QUERY_KEY.DONE} reload`);
