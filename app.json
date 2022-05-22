@@ -1,4 +1,7 @@
 {
   "name": "gotomap",
-  "displayName": "gotomap"
+  "displayName": "gotomap",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-1963334904140891~8737134718"
+  }
 }

@@ -24,6 +24,7 @@ import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Avatar, Layout, Button, ListItem} from '@ui-kitten/components';
 import {useQueryClient, useMutation} from 'react-query';
+import {placeStore} from '../stores/place';
 
 const toastConfig = {
   success: props => (
@@ -52,10 +53,13 @@ const toastConfig = {
 
 export const MapDetail = ({searchItem}) => {
   const queryClient = useQueryClient();
-  const {loginStore, placeStore} = useStore();
+  const {loginStore} = useStore();
   const [isGo, setIsGo] = useState(false);
 
   const addMutation = useMutation(addPlace, {
+    onMutate: () => {
+      placeStore.setForceBacklogRefresh(true);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(QUERY_KEY.ALL);
       queryClient.invalidateQueries(QUERY_KEY.BACKLOG);
@@ -107,11 +111,8 @@ export const MapDetail = ({searchItem}) => {
     };
 
     try {
-      placeStore.setForceRefresh(true);
-      setTimeout(() => {
-        addMutation.mutate(params);
-      }, 10);
       setIsGo(!isGo);
+      addMutation.mutate(params);
     } catch (e) {
       console.log(e);
     }

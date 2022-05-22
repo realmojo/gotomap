@@ -1,10 +1,22 @@
 import {observable, runInAction} from 'mobx';
 
 const placeStore = observable({
-  forceRefresh: true,
-  setForceRefresh(value) {
+  forceBacklogRefresh: true,
+  forceDoneRefresh: true,
+  placeItemRefresh: true,
+  setForceBacklogRefresh(value) {
     runInAction(() => {
-      this.forceRefresh = value;
+      this.forceBacklogRefresh = value;
+    });
+  },
+  setForceDoneRefresh(value) {
+    runInAction(() => {
+      this.forceDoneRefresh = value;
+    });
+  },
+  setPlaceItemRefresh() {
+    runInAction(() => {
+      this.placeItemRefresh = !this.placeItemRefresh;
     });
   },
 });

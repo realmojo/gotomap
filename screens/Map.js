@@ -21,7 +21,7 @@ import {getMapDetailInfo, getSearchPlaces, getPlaces} from '../api';
 import BottomSheet from 'react-native-gesture-bottom-sheet';
 import {useQueryClient, useQuery} from 'react-query';
 import {PLACE_STATUS, QUERY_KEY} from '../config/constants';
-import {MapDetail, PlaceDetail} from '../components';
+import {MapDetail, PlaceDetail, Admob} from '../components';
 
 export const Map = ({navigation}) => {
   const queryClient = useQueryClient();
@@ -49,12 +49,12 @@ export const Map = ({navigation}) => {
   });
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('tabLongPress', () => {
+    const newData = navigation.addListener('tabLongPress', () => {
       queryClient.invalidateQueries(QUERY_KEY.ALL);
       ToastAndroid.show('데이터를 새로 가져옵니다.', ToastAndroid.SHORT);
     });
 
-    return unsubscribe;
+    return newData;
   }, [navigation]);
 
   const doClose = () => {
@@ -62,7 +62,7 @@ export const Map = ({navigation}) => {
     setPlaces([]);
   };
 
-  const placeClick = async (id, latitude, longitude, title) => {
+  const placeClick = async (id, latitude, longitude) => {
     setId(id);
     bottomSheet.current.show();
 
@@ -184,7 +184,9 @@ export const Map = ({navigation}) => {
               />
             ))}
         </NaverMapView>
+        <Admob />
       </View>
+      <Admob />
       <BottomSheet
         hasDraggableIcon
         ref={bottomSheet}
@@ -197,7 +199,13 @@ export const Map = ({navigation}) => {
         ref={bottomSheetDetail}
         onRequestClose={() => bottomSheetDetail.current.close()}
         height={600}>
-        <PlaceDetail placeItem={placeItem} queryKey={QUERY_KEY.ALL} />
+        <PlaceDetail
+          placeItem={placeItem}
+          queryKey={
+            placeItem.status === 'done' ? QUERY_KEY.DONE : QUERY_KEY.BACKLOG
+          }
+          setPlaceItem={setPlaceItem}
+        />
       </BottomSheet>
     </Layout>
   );

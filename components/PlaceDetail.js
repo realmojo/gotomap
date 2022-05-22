@@ -14,8 +14,9 @@ import {
 import {PLACE_STATUS, PLACE_STATUS_KR, QUERY_KEY} from '../config/constants';
 import {useQueryClient, useMutation} from 'react-query';
 import {Category, Title} from '../utils';
+import {placeStore} from '../stores/place';
 
-export const PlaceDetail = ({placeItem, queryKey}) => {
+export const PlaceDetail = ({placeItem, setPlaceItem, queryKey}) => {
   const queryClient = useQueryClient();
   const {
     _id,
@@ -46,6 +47,7 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
 
   const doSave = _id => {
     setIsMemoInput(false);
+    setStateMemo(value);
     doUpdatePlaceMemo({_id, memo: value});
   };
 
@@ -70,9 +72,22 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
           return place._id === item._id;
         });
         places[findIndex].memo = item.memo;
+        if (setPlaceItem) {
+          setPlaceItem(places[findIndex]);
+        }
+        placeStore.setPlaceItemRefresh();
         return places;
       });
       return previousValue;
+    },
+    onSuccess: item => {
+      queryClient.setQueryData(QUERY_KEY.ALL, places => {
+        const findIndex = places.findIndex(place => {
+          return place._id === item._id;
+        });
+        places[findIndex].memo = item.memo;
+        return places;
+      });
     },
   });
 
@@ -80,32 +95,20 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
     params => updatePlaceStatus(params),
     {
       onMutate: item => {
-        if (
-          forceStatusText === 'done' ||
-          (queryKey === QUERY_KEY.ALL && item.status === 'done')
-        ) {
+        if (forceStatusText === 'done') {
           queryKey = QUERY_KEY.DONE;
-        } else if (
-          forceStatusText === 'backlog' ||
-          (queryKey === QUERY_KEY.ALL && item.status === 'backlog')
-        ) {
+        } else if (forceStatusText === 'backlog') {
           queryKey = QUERY_KEY.BACKLOG;
         }
 
+        placeStore.setForceBacklogRefresh(true);
+        placeStore.setForceDoneRefresh(true);
         if (queryKey === QUERY_KEY.BACKLOG) {
           setForceStatusAppearance('filled');
           setForceStatusText('done');
         } else if (queryKey === QUERY_KEY.DONE) {
           setForceStatusAppearance('outline');
           setForceStatusText('backlog');
-        } else if (queryKey === QUERY_KEY.ALL) {
-          if (item.status === PLACE_STATUS.BACKLOG) {
-            setForceStatusAppearance('outline');
-            setForceStatusText('backlog');
-          } else {
-            setForceStatusAppearance('filled');
-            setForceStatusText('done');
-          }
         }
 
         const previousValue = queryClient.setQueryData(queryKey, places => {
@@ -118,6 +121,18 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
         return previousValue;
       },
       onSuccess: item => {
+        // if (queryKey === QUERY_KEY.BACKLOG || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.DONE)) {
+        if (item.status === PLACE_STATUS.DONE) {
+          queryClient.setQueryData(QUERY_KEY.DONE, places => {
+            return [item, ...places];
+          });
+          // } else if (queryKey === QUERY_KEY.DONE || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.BACKLOG)) {
+        } else if (item.status === PLACE_STATUS.BACKLOG) {
+          queryClient.setQueryData(QUERY_KEY.BACKLOG, places => {
+            return [item, ...places];
+          });
+        }
+
         queryClient.invalidateQueries(QUERY_KEY.ALL);
         queryClient.setQueryData(QUERY_KEY.PLACE_COUNT, placeCount => {
           const {totalCount, backlogCount, doneCount} = placeCount;
@@ -131,17 +146,6 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
               queryKey === QUERY_KEY.BACKLOG ? doneCount + 1 : doneCount - 1,
           };
         });
-        // if (queryKey === QUERY_KEY.BACKLOG || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.DONE)) {
-        if (item.status === PLACE_STATUS.DONE) {
-          queryClient.setQueryData(QUERY_KEY.DONE, places => {
-            return [item, ...places];
-          });
-          // } else if (queryKey === QUERY_KEY.DONE || (queryKey === QUERY_KEY.ALL && item.status === PLACE_STATUS.BACKLOG)) {
-        } else if (item.status === PLACE_STATUS.BACKLOG) {
-          queryClient.setQueryData(QUERY_KEY.BACKLOG, places => {
-            return [item, ...places];
-          });
-        }
       },
     },
   );
@@ -247,7 +251,7 @@ export const PlaceDetail = ({placeItem, queryKey}) => {
         </Layout>
       </ScrollView>
       {!isMemoInput && (
-        <View style={styles.modalContentFooter}>
+        <View>
           <Button
             size="giant"
             appearance={
@@ -300,7 +304,6 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'transparent',
   },
-  modalContentFooter: {},
   closeIcon: {
     flex: 1,
     justifyContent: 'flex-end',

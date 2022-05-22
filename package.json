@@ -1,6 +1,6 @@
 {
   "name": "gotomap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -33,6 +33,7 @@
     "react-native": "0.68.1",
     "react-native-gesture-bottom-sheet": "^1.1.0",
     "react-native-gesture-handler": "^2.4.2",
+    "react-native-google-mobile-ads": "^6.2.5",
     "react-native-nmap": "^0.0.66",
     "react-native-pager-view": "^5.4.15",
     "react-native-paper": "^4.12.1",

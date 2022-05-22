@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Text, Avatar, TopNavigation, Layout} from '@ui-kitten/components';
+import {Text, Avatar, Layout, TopNavigation} from '@ui-kitten/components';
 import {getPlaceByStatus} from '../api';
-import {PlaceList, LoadingIndicator, Error} from '../components';
+import {PlaceList, LoadingIndicator, Error, Admob} from '../components';
 import {PLACE_STATUS, PLACE_STATUS_KR, QUERY_KEY} from '../config/constants';
 import {useQuery} from 'react-query';
 import useStore from '../stores';
@@ -25,14 +25,11 @@ export const PlaceDone = ({navigation}) => {
     () => getPlaceByStatus(PLACE_STATUS.DONE),
     {
       onSuccess: items => {
-        console.log('forceRefresh: ', placeStore.forceRefresh);
-        if (placeStore.forceRefresh) {
-          console.log(
-            `${QUERY_KEY.DONE} items all loading: `,
-            items ? items.length : '',
-          );
+        console.log('forceDoneRefresh: ', placeStore.forceDoneRefresh);
+        if (placeStore.forceDoneRefresh) {
+          console.log(`${QUERY_KEY.DONE} items all loading: `, items.length);
           setAllData(items);
-          placeStore.setForceRefresh(false);
+          placeStore.setForceDoneRefresh(false);
         }
         console.log(`${QUERY_KEY.DONE} reload`);
       },
@@ -47,7 +44,7 @@ export const PlaceDone = ({navigation}) => {
   };
 
   useEffect(() => {
-    placeStore.setForceRefresh(true);
+    placeStore.setForceDoneRefresh(true);
   }, []);
 
   if (isLoading) {
@@ -61,13 +58,16 @@ export const PlaceDone = ({navigation}) => {
   return (
     <Layout level="2" style={styles.layoutContainer}>
       <TopNavigation title={renderTitle} />
-      <PlaceList
-        allData={allData}
-        data={data}
-        navigation={navigation}
-        naviMapInfo={naviMapInfo}
-        queryKey={QUERY_KEY.DONE}
-      />
+      <View style={{flex: 1}}>
+        <PlaceList
+          allData={allData}
+          data={data}
+          navigation={navigation}
+          naviMapInfo={naviMapInfo}
+          queryKey={QUERY_KEY.DONE}
+        />
+      </View>
+      <Admob />
     </Layout>
   );
 };
