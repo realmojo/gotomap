@@ -8,7 +8,6 @@ import {getId, googleSigninConfigure} from '../api';
 
 export const Login = () => {
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const {loginStore, userStore} = useStore();
   const doKakaoLogin = () => {
     setIsKakaoLoading(true);
@@ -16,18 +15,16 @@ export const Login = () => {
     setIsKakaoLoading(false);
   };
   const doGoogleLogin = () => {
-    setIsGoogleLoading(true);
     loginStore.socialGoogleLogin();
-    setIsGoogleLoading(false);
   };
   const {isLoading} = useQuery('login', getId, {
+    // 성공시 호출
     onSuccess: data => {
-      // 성공시 호출
       console.log('logon data: ', data);
+      alert(data);
       if (data) {
-        loginStore.setIslogin(true);
-        loginStore.socialKakaoLogin();
         userStore.setId(data);
+        loginStore.setIslogin(true);
       }
     },
   });
@@ -39,6 +36,7 @@ export const Login = () => {
   if (isLoading) {
     return <LoadingIndicator />;
   }
+  alert(12);
   return (
     <Layout style={styles.container}>
       <View style={styles.imageWrap}>
@@ -53,9 +51,8 @@ export const Login = () => {
         </Text>
       </View>
       <View style={styles.buttonWrap}>
-        {/* <GoogleSigninButton onPress={() => onGoogleButtonPress()} /> */}
         <Button style={styles.googleButton} onPress={() => doGoogleLogin()}>
-          {isGoogleLoading ? <LoadingIndicator /> : '구글로 로그인'}
+          구글로 로그인
         </Button>
         <Button
           style={styles.button}

@@ -1,4 +1,7 @@
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const getGoogleSignin = () => {
   return GoogleSignin;
@@ -16,7 +19,6 @@ const googleLogin = async () => {
     const {
       user: {familyName, givenName, id, photo},
     } = await GoogleSignin.signIn();
-    console.log(id, photo, familyName);
     return {
       id,
       name: `${familyName}${givenName}`,
@@ -25,15 +27,15 @@ const googleLogin = async () => {
   } catch (error) {
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       // user cancelled the login flow
-      console.log('err1: ', statusCodes.SIGN_IN_CANCELLED);
+      alert('err1: ', statusCodes.SIGN_IN_CANCELLED);
     } else if (error.code === statusCodes.IN_PROGRESS) {
       // operation (e.g. sign in) is in progress already
-      console.log('err2: ', statusCodes.IN_PROGRESS);
+      alert('err2: ', statusCodes.IN_PROGRESS);
     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       // play services not available or outdated
-      console.log('err3: ', statusCodes.PLAY_SERVICES_NOT_AVAILABLE);
+      alert('err3: ', statusCodes.PLAY_SERVICES_NOT_AVAILABLE);
     } else {
-      console.log('err4: ', error);
+      alert('err4: ', error);
       // some other error happened
     }
   }
