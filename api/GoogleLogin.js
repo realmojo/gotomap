@@ -1,0 +1,42 @@
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+
+const getGoogleSignin = () => {
+  return GoogleSignin;
+};
+
+const googleSigninConfigure = () => {
+  GoogleSignin.configure({
+    webClientId:
+      '350541454372-u3u3mcbeeb5ack92ea241qo7pa1bceg0.apps.googleusercontent.com',
+  });
+};
+
+const googleLogin = async () => {
+  try {
+    const {
+      user: {familyName, givenName, id, photo},
+    } = await GoogleSignin.signIn();
+    console.log(id, photo, familyName);
+    return {
+      id,
+      name: `${familyName}${givenName}`,
+      profileImage: photo,
+    };
+  } catch (error) {
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      // user cancelled the login flow
+      console.log('err1: ', statusCodes.SIGN_IN_CANCELLED);
+    } else if (error.code === statusCodes.IN_PROGRESS) {
+      // operation (e.g. sign in) is in progress already
+      console.log('err2: ', statusCodes.IN_PROGRESS);
+    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      // play services not available or outdated
+      console.log('err3: ', statusCodes.PLAY_SERVICES_NOT_AVAILABLE);
+    } else {
+      console.log('err4: ', error);
+      // some other error happened
+    }
+  }
+};
+
+export {googleLogin, getGoogleSignin, googleSigninConfigure};

@@ -1,17 +1,24 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
 import {Button, Layout, Text} from '@ui-kitten/components';
 import useStore from '../stores';
 import {useQuery} from 'react-query';
-import {getId} from '../api';
 import {LoadingIndicator} from '../components';
+import {getId, googleSigninConfigure} from '../api';
 
 export const Login = () => {
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const {loginStore, userStore} = useStore();
-  const doLogin = () => {
+  const doKakaoLogin = () => {
     setIsKakaoLoading(true);
     loginStore.socialKakaoLogin();
+    setIsKakaoLoading(false);
+  };
+  const doGoogleLogin = () => {
+    setIsGoogleLoading(true);
+    loginStore.socialGoogleLogin();
+    setIsGoogleLoading(false);
   };
   const {isLoading} = useQuery('login', getId, {
     onSuccess: data => {
@@ -24,6 +31,11 @@ export const Login = () => {
       }
     },
   });
+
+  useEffect(() => {
+    googleSigninConfigure();
+  }, []);
+
   if (isLoading) {
     return <LoadingIndicator />;
   }
@@ -41,7 +53,14 @@ export const Login = () => {
         </Text>
       </View>
       <View style={styles.buttonWrap}>
-        <Button style={styles.button} onPress={() => doLogin()} status="basic">
+        {/* <GoogleSigninButton onPress={() => onGoogleButtonPress()} /> */}
+        <Button style={styles.googleButton} onPress={() => doGoogleLogin()}>
+          {isGoogleLoading ? <LoadingIndicator /> : '구글로 로그인'}
+        </Button>
+        <Button
+          style={styles.button}
+          onPress={() => doKakaoLogin()}
+          status="basic">
           {isKakaoLoading ? <LoadingIndicator /> : '카카오로 로그인'}
         </Button>
       </View>
@@ -79,8 +98,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
   },
+  googleButton: {
+    borderColor: '#e1494d',
+    backgroundColor: '#e1494d',
+  },
   button: {
-    margin: 40,
+    // margin: 40,
+    marginTop: 20,
+    marginBottom: 40,
     backgroundColor: '#fae100',
     borderColor: '#fae100',
     width: 300,

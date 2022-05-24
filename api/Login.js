@@ -14,8 +14,10 @@ const setStorageId = async id => {
 const addUser = params => {
   const param = {
     id: params.id,
-    name: params.properties.nickname,
-    profileImage: params.properties.profile_image,
+    name: params.name ? params.name : params.properties.nickname,
+    profileImage: params.profileImage
+      ? params.profileImage
+      : params.properties.profile_image,
     created: moment().format('YYYY-MM-DD HH:mm:ss'),
   };
   return new Promise((resolve, reject) => {
