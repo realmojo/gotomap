@@ -66,7 +66,7 @@ export default function App() {
             onStateChange={async () => {
               const previousRouteName = routeNameRef.current;
               const currentRouteName =
-                navigationRef.current.getCurrentRoute().name;
+                navigationRef.current.getCurrentRoute().name || 'Login';
 
               if (previousRouteName !== currentRouteName) {
                 await analytics().logScreenView({

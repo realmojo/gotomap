@@ -8,5 +8,9 @@ const getId = () => {
     }, 100);
   });
 };
+const getName = async () => {
+  const name = await AsyncStorage.getItem('name');
+  return name;
+};
 
-export {getId};
+export {getId, getName};

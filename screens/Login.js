@@ -1,28 +1,55 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
-import {Button, Layout, Text} from '@ui-kitten/components';
+import {Button, Input, Layout, Text, Spinner} from '@ui-kitten/components';
 import useStore from '../stores';
 import {useQuery} from 'react-query';
+import {addUser, getId, getName} from '../api';
+import {getUniqueId} from 'react-native-device-info';
 import {LoadingIndicator} from '../components';
-import {getId, googleSigninConfigure} from '../api';
+
+const LoadingIcon = () => (
+  <View>
+    <Spinner status="control" size="small" />
+  </View>
+);
 
 export const Login = () => {
-  const [isKakaoLoading, setIsKakaoLoading] = useState(false);
+  const inputRef = useRef();
   const {loginStore, userStore} = useStore();
-  const doKakaoLogin = () => {
-    setIsKakaoLoading(true);
-    loginStore.socialKakaoLogin();
-    setIsKakaoLoading(false);
-  };
-  const doGoogleLogin = () => {
-    loginStore.socialGoogleLogin();
-  };
+  const [value, setValue] = useState('');
+  const [uniqueId, setUniqueId] = useState('');
+  const [isStartLoading, setIsStartLoading] = useState(false);
+  const doLogin = useCallback(async () => {
+    if (value === '') {
+      inputRef.current.focus();
+      return;
+    }
+
+    setIsStartLoading(true);
+    const params = {
+      id: uniqueId,
+      name: value,
+    };
+    const res = await addUser(params);
+
+    if (res && res.id) {
+      loginStore.setIslogin(true);
+      userStore.setId(res.id, {
+        id: res.id,
+        name: res.name,
+      });
+    }
+    setTimeout(() => {
+      setIsStartLoading(false);
+    }, 1000);
+  }, [value]);
   const {isLoading} = useQuery('login', getId, {
     // 성공시 호출
-    onSuccess: data => {
+    onSuccess: async data => {
       console.log('logon data: ', data);
-      alert(data);
       if (data) {
+        const userName = await getName();
+        userStore.setName(userName);
         userStore.setId(data);
         loginStore.setIslogin(true);
       }
@@ -30,13 +57,16 @@ export const Login = () => {
   });
 
   useEffect(() => {
-    googleSigninConfigure();
+    (async () => {
+      const uniqueId = await getUniqueId();
+      setUniqueId(uniqueId);
+    })();
   }, []);
 
   if (isLoading) {
     return <LoadingIndicator />;
   }
-  alert(12);
+
   return (
     <Layout style={styles.container}>
       <View style={styles.imageWrap}>
@@ -47,20 +77,38 @@ export const Login = () => {
           />
         </View>
         <Text style={styles.description}>
-          가보고 싶은 곳을 일정에 등록해보세요
+          가봐야지도에 오신 것을 환영합니다. 사용하실 닉네임을 간단하게
+          적어주세요.
         </Text>
       </View>
       <View style={styles.buttonWrap}>
-        <Button style={styles.googleButton} onPress={() => doGoogleLogin()}>
-          구글로 로그인
+        <Input
+          style={styles.input}
+          ref={inputRef}
+          size="large"
+          placeholder="닉네임을 입력해주세요"
+          value={value}
+          status="warning"
+          onChangeText={setValue}
+        />
+        <Button
+          style={styles.button}
+          loading
+          size="large"
+          status="warning"
+          accessoryRight={isStartLoading ? LoadingIcon : null}
+          onPress={() => doLogin()}>
+          시작하기
         </Button>
+      </View>
+      {/* <<View style={styles.buttonWrap}>
         <Button
           style={styles.button}
           onPress={() => doKakaoLogin()}
           status="basic">
           {isKakaoLoading ? <LoadingIndicator /> : '카카오로 로그인'}
         </Button>
-      </View>
+      </View> */}
     </Layout>
   );
 };
@@ -76,6 +124,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 12,
     color: '#97690f',
+    width: 200,
+    textAlign: 'center',
+    // : 0.8,
   },
   image: {
     width: 80,
@@ -93,18 +144,15 @@ const styles = StyleSheet.create({
   },
   buttonWrap: {
     flex: 1,
-    justifyContent: 'flex-end',
+    marginTop: 20,
+    width: 200,
+    justifyContent: 'flex-start',
   },
   googleButton: {
     borderColor: '#e1494d',
     backgroundColor: '#e1494d',
   },
   button: {
-    // margin: 40,
     marginTop: 20,
-    marginBottom: 40,
-    backgroundColor: '#fae100',
-    borderColor: '#fae100',
-    width: 300,
   },
 });

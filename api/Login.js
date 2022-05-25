@@ -10,14 +10,18 @@ const setStorageId = async id => {
     console.log(e);
   }
 };
+const setStorageName = async name => {
+  try {
+    await AsyncStorage.setItem('name', name);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 const addUser = params => {
   const param = {
     id: params.id,
-    name: params.name ? params.name : params.properties.nickname,
-    profileImage: params.profileImage
-      ? params.profileImage
-      : params.properties.profile_image,
+    name: params.name,
     created: moment().format('YYYY-MM-DD HH:mm:ss'),
   };
   return new Promise((resolve, reject) => {
@@ -25,6 +29,7 @@ const addUser = params => {
       .post(`${API_URL}/user`, param)
       .then(res => {
         setStorageId(res.data.id);
+        setStorageName(res.data.name);
         resolve(res.data);
       })
       .catch(e => {

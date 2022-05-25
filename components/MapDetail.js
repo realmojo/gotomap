@@ -18,13 +18,13 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import useStore from '../stores';
 import moment from 'moment';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Avatar, Layout, Button, ListItem} from '@ui-kitten/components';
 import {useQueryClient, useMutation} from 'react-query';
 import {placeStore} from '../stores/place';
+import {userStore} from '../stores/user';
 
 const toastConfig = {
   success: props => (
@@ -53,7 +53,6 @@ const toastConfig = {
 
 export const MapDetail = ({searchItem}) => {
   const queryClient = useQueryClient();
-  const {loginStore} = useStore();
   const [isGo, setIsGo] = useState(false);
 
   const addMutation = useMutation(addPlace, {
@@ -85,11 +84,10 @@ export const MapDetail = ({searchItem}) => {
       keywords,
       bizhourInfo,
     } = searchItem;
-    const {id: userId} = loginStore.userInfo;
     const {sido, sigungu} = getSidoAndSigungu(fullAddress, addressAbbr);
     const params = {
       placeId,
-      userId,
+      userId: userStore.userId,
       latitude, // 위도
       longitude, // 경도
       title,

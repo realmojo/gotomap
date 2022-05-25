@@ -1,26 +1,23 @@
 import React from 'react';
 import {StyleSheet, View, Linking, Image} from 'react-native';
-import {Layout, Text, ListItem, Divider} from '@ui-kitten/components';
+import {
+  Text,
+  Icon,
+  Button,
+  Layout,
+  Divider,
+  ListItem,
+} from '@ui-kitten/components';
 import useStore from '../stores';
 import {observer} from 'mobx-react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useQuery} from 'react-query';
 import {Admob, LoadingIndicator} from '../components';
 import {getPlaceCount} from '../api';
 import {QUERY_KEY} from '../config/constants';
 
-const removeId = async () => {
-  await AsyncStorage.removeItem('id');
-};
-
+const StarIcon = props => <Icon {...props} name="star" />;
 export const My = observer(() => {
-  const {loginStore} = useStore();
-  const {name, profileImage} = loginStore.userInfo;
-  const doLogout = async () => {
-    await removeId();
-    loginStore.setIslogin(false);
-  };
-
+  const {userStore} = useStore();
   const {isLoading, data} = useQuery(
     QUERY_KEY.PLACE_COUNT,
     () => getPlaceCount(),
@@ -45,13 +42,9 @@ export const My = observer(() => {
           <View style={styles.logoWrap}>
             <Image
               style={styles.avatar}
-              source={
-                profileImage
-                  ? {uri: profileImage}
-                  : require('../assets/images/logo.png')
-              }
+              source={require('../assets/images/logo.png')}
             />
-            <Text category="h3">{name}</Text>
+            <Text category="h3">{userStore.userName}</Text>
           </View>
           <Layout style={styles.countContainer} level="1">
             <View style={styles.countWrap}>
@@ -71,7 +64,7 @@ export const My = observer(() => {
         <Layout level="2">
           <ListItem
             style={styles.listItem}
-            title="피드백을 주세요"
+            title="이름 변경"
             onPress={() =>
               Linking.openURL(
                 'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
@@ -81,8 +74,12 @@ export const My = observer(() => {
           <Divider />
           <ListItem
             style={styles.listItem}
-            title="로그아웃"
-            onPress={() => doLogout()}
+            title="피드백을 주세요"
+            onPress={() =>
+              Linking.openURL(
+                'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
+              )
+            }
           />
           <Divider />
         </Layout>

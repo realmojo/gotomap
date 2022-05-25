@@ -1,5 +1,4 @@
 import React from 'react';
-import {View, Text} from 'react-native';
 import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 
 const adUnitId = __DEV__
