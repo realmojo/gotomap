@@ -2,13 +2,6 @@
 # yarn lockfile v1
 
 
-"@actbase/react-kakaosdk@^0.9.19":
-  version "0.9.19"
-  resolved "https://registry.yarnpkg.com/@actbase/react-kakaosdk/-/react-kakaosdk-0.9.19.tgz#9c6063d8406dd8958f961d70f0cf50d271426fab"
-  integrity sha512-a1Xe5hKw6HxJVJtE/vGE36c/H/YEzK8x0EvAXg1rsAMwQj2ADXnEwNRU1gbb6E8fSRd4rsXMz/vL4voaMzhdfw==
-  dependencies:
-    plist "^3.0.2"
-
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"

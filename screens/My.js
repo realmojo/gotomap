@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, View, Linking, Image} from 'react-native';
 import {
   Text,
-  Icon,
-  Button,
+  Input,
   Layout,
+  Button,
   Divider,
   ListItem,
 } from '@ui-kitten/components';
@@ -12,12 +12,14 @@ import useStore from '../stores';
 import {observer} from 'mobx-react';
 import {useQuery} from 'react-query';
 import {Admob, LoadingIndicator} from '../components';
-import {getPlaceCount} from '../api';
+import {getPlaceCount, patchUsername} from '../api';
 import {QUERY_KEY} from '../config/constants';
 
-const StarIcon = props => <Icon {...props} name="star" />;
 export const My = observer(() => {
   const {userStore} = useStore();
+  const [isEdit, setIsEdit] = useState(false);
+  const [value, setValue] = useState('');
+
   const {isLoading, data} = useQuery(
     QUERY_KEY.PLACE_COUNT,
     () => getPlaceCount(),
@@ -30,6 +32,23 @@ export const My = observer(() => {
       },
     },
   );
+
+  const doEdit = () => {
+    setIsEdit(!isEdit);
+    setValue(userStore.userName);
+  };
+
+  const changeName = async () => {
+    const params = {
+      name: value,
+    };
+    const res = await patchUsername(params);
+    if (res.name) {
+      setIsEdit(!isEdit);
+      setValue(res.name);
+      userStore.setName(res.name);
+    }
+  };
 
   if (isLoading) {
     return <LoadingIndicator />;
@@ -44,7 +63,27 @@ export const My = observer(() => {
               style={styles.avatar}
               source={require('../assets/images/logo.png')}
             />
-            <Text category="h3">{userStore.userName}</Text>
+            {isEdit ? (
+              <>
+                <View style={{flexDirection: 'row'}}>
+                  <Input
+                    style={{width: 200}}
+                    placeholder="이름을 입력하세요"
+                    value={value}
+                    onChangeText={nextValue => setValue(nextValue)}
+                  />
+                  <Button
+                    style={{marginLeft: 4}}
+                    size="small"
+                    status="warning"
+                    onPress={() => changeName()}>
+                    SAVE
+                  </Button>
+                </View>
+              </>
+            ) : (
+              <Text category="h3">{userStore.userName}</Text>
+            )}
           </View>
           <Layout style={styles.countContainer} level="1">
             <View style={styles.countWrap}>
@@ -65,11 +104,7 @@ export const My = observer(() => {
           <ListItem
             style={styles.listItem}
             title="이름 변경"
-            onPress={() =>
-              Linking.openURL(
-                'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
-              )
-            }
+            onPress={() => doEdit()}
           />
           <Divider />
           <ListItem
