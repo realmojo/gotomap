@@ -75,7 +75,8 @@ export default function App() {
                 });
               }
               routeNameRef.current = currentRouteName;
-            }}>
+            }}
+          >
             <TotalStack />
           </NavigationContainer>
         </ApplicationProvider>

@@ -64,23 +64,23 @@ export const My = observer(() => {
               source={require('../assets/images/logo.png')}
             />
             {isEdit ? (
-              <>
-                <View style={{flexDirection: 'row'}}>
-                  <Input
-                    style={{width: 200}}
-                    placeholder="이름을 입력하세요"
-                    value={value}
-                    onChangeText={nextValue => setValue(nextValue)}
-                  />
-                  <Button
-                    style={{marginLeft: 4}}
-                    size="small"
-                    status="warning"
-                    onPress={() => changeName()}>
-                    SAVE
-                  </Button>
-                </View>
-              </>
+              <View style={{flexDirection: 'row'}}>
+                <Input
+                  style={{width: 200}}
+                  placeholder="이름을 입력하세요"
+                  value={value}
+                  status="warning"
+                  onChangeText={nextValue => setValue(nextValue)}
+                />
+                <Button
+                  style={{marginLeft: 4}}
+                  size="small"
+                  status="warning"
+                  onPress={() => changeName()}
+                >
+                  변경
+                </Button>
+              </View>
             ) : (
               <Text category="h3">{userStore.userName}</Text>
             )}
@@ -112,7 +112,7 @@ export const My = observer(() => {
             title="피드백을 주세요"
             onPress={() =>
               Linking.openURL(
-                'https://play.google.com/store/apps/details?id=com.f5game.gotomap',
+                'https://play.google.com/store/apps/details?id=com.f5game.gomap',
               )
             }
           />

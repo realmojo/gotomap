@@ -1,4 +1,4 @@
-package com.f5game.gotomap.newarchitecture;
+package com.f5game.gomap.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.f5game.gotomap.BuildConfig;
-import com.f5game.gotomap.newarchitecture.components.MainComponentsRegistry;
-import com.f5game.gotomap.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.f5game.gomap.BuildConfig;
+import com.f5game.gomap.newarchitecture.components.MainComponentsRegistry;
+import com.f5game.gomap.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

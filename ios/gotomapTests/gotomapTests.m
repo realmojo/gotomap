@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface gotomapTests : XCTestCase
+@interface gomapTests : XCTestCase
 
 @end
 
-@implementation gotomapTests
+@implementation gomapTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {

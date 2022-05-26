@@ -17,7 +17,8 @@ export const BottomTab = () => {
           tabBarStyle: {backgroundColor: 'white'},
           tabBarPressColor: '#dedede',
         }}
-        tabBarPosition="bottom">
+        tabBarPosition="bottom"
+      >
         <Tab.Screen
           name="Map"
           component={Map}

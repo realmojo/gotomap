@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import {StyleSheet, Image, View} from 'react-native';
 import {Button, Input, Layout, Text, Spinner} from '@ui-kitten/components';
 import useStore from '../stores';
@@ -17,9 +17,10 @@ export const Login = () => {
   const inputRef = useRef();
   const {loginStore, userStore} = useStore();
   const [value, setValue] = useState('');
-  const [uniqueId, setUniqueId] = useState('');
   const [isStartLoading, setIsStartLoading] = useState(false);
   const doLogin = useCallback(async () => {
+    const uniqueId = await getUniqueId();
+
     if (value === '') {
       inputRef.current.focus();
       return;
@@ -33,15 +34,11 @@ export const Login = () => {
     const res = await addUser(params);
 
     if (res && res.id) {
-      loginStore.setIslogin(true);
-      userStore.setId(res.id, {
-        id: res.id,
-        name: res.name,
-      });
-    }
-    setTimeout(() => {
       setIsStartLoading(false);
-    }, 1000);
+      userStore.setName(res.name);
+      userStore.setId(res.id);
+      loginStore.setIslogin(true);
+    }
   }, [value]);
   const {isLoading} = useQuery('login', getId, {
     // 성공시 호출
@@ -55,13 +52,6 @@ export const Login = () => {
       }
     },
   });
-
-  useEffect(() => {
-    (async () => {
-      const uniqueId = await getUniqueId();
-      setUniqueId(uniqueId);
-    })();
-  }, []);
 
   if (isLoading) {
     return <LoadingIndicator />;
@@ -97,18 +87,11 @@ export const Login = () => {
           size="large"
           status="warning"
           accessoryRight={isStartLoading ? LoadingIcon : null}
-          onPress={() => doLogin()}>
+          onPress={() => doLogin()}
+        >
           시작하기
         </Button>
       </View>
-      {/* <<View style={styles.buttonWrap}>
-        <Button
-          style={styles.button}
-          onPress={() => doKakaoLogin()}
-          status="basic">
-          {isKakaoLoading ? <LoadingIndicator /> : '카카오로 로그인'}
-        </Button>
-      </View> */}
     </Layout>
   );
 };
@@ -126,7 +109,6 @@ const styles = StyleSheet.create({
     color: '#97690f',
     width: 200,
     textAlign: 'center',
-    // : 0.8,
   },
   image: {
     width: 80,

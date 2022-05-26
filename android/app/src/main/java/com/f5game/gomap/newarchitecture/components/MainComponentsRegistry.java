@@ -1,4 +1,4 @@
-package com.f5game.gotomap.newarchitecture.components;
+package com.f5game.gomap.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

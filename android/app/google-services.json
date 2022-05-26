@@ -1,15 +1,15 @@
 {
   "project_info": {
     "project_number": "350541454372",
-    "project_id": "gotomap-32915",
-    "storage_bucket": "gotomap-32915.appspot.com"
+    "project_id": "gomap-32915",
+    "storage_bucket": "gomap-32915.appspot.com"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:350541454372:android:9c826de7bee147eeb3ccb1",
         "android_client_info": {
-          "package_name": "com.f5game.gotomap"
+          "package_name": "com.f5game.gomap"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "350541454372-ra0hq0f8ah61lqmm9gk329ro6u2srskg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.f5game.gotomap",
+            "package_name": "com.f5game.gomap",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },

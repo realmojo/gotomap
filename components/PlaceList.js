@@ -118,7 +118,8 @@ const PlaceList = observer(
             hasDraggableIcon
             onRequestClose={() => doClose()}
             ref={bottomSheet}
-            height={600}>
+            height={600}
+          >
             <PlaceDetail placeItem={placeItem} queryKey={queryKey} />
           </BottomSheet>
           <Layout style={styles.layoutContainer} level="2">
@@ -126,16 +127,18 @@ const PlaceList = observer(
               style={styles.select}
               value={selectedSido.name_kr}
               selectedIndex={selectedSidoIndex}
-              onSelect={index => doSidoSelect(index)}>
+              onSelect={index => doSidoSelect(index)}
+            >
               {SIDO.map((item, index) => (
-                <SelectItem key={index} title={`${item.name_kr}`} />
+                <SelectItem key={index} title={item.name_kr} />
               ))}
             </Select>
             <Select
               style={styles.select}
               value={selectedSigungu.name_kr}
               selectedIndex={selectedSigunguIndex}
-              onSelect={index => doSigunguSelect(index)}>
+              onSelect={index => doSigunguSelect(index)}
+            >
               {selectedSido !== 'All' &&
                 sigunguOptions.map((item, index) => (
                   <SelectItem key={index} title={item.name_kr} />
@@ -143,32 +146,28 @@ const PlaceList = observer(
             </Select>
           </Layout>
           {data !== null && data.length !== 0 ? (
-            <>
-              <List
-                style={styles.container}
-                contentContainerStyle={styles.contentContainer}
-                data={data}
-                renderItem={item => (
-                  <PlaceListItem
-                    item={item}
-                    callbackModal={openModal}
-                    naviMapInfo={naviMapInfo}
-                    queryKey={queryKey}
-                  />
-                )}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-              />
-            </>
+            <List
+              style={styles.container}
+              contentContainerStyle={styles.contentContainer}
+              data={data}
+              renderItem={item => (
+                <PlaceListItem
+                  item={item}
+                  callbackModal={openModal}
+                  naviMapInfo={naviMapInfo}
+                  queryKey={queryKey}
+                />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
           ) : (
             <ScrollView
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }>
+              }
+            >
               <Nothing navigation={navigation} queryKey={queryKey} />
             </ScrollView>
           )}

@@ -26,7 +26,7 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
   const doDelete = (title, _id) => {
     Alert.alert(
       `${title} 장소를 삭제합니다.`,
-      '삭제를 하시면 복구를 하실 없습니다.',
+      '삭제하시면 복구할 수 없습니다.',
       [
         {
           text: '취소',
@@ -153,7 +153,8 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
         <Card
           style={styles.item}
           status="basic"
-          header={() => renderItemHeader(item.item)}>
+          header={() => renderItemHeader(item.item)}
+        >
           <TextDetail
             iconName="map-marker"
             text={fullAddress}
@@ -177,7 +178,8 @@ const PlaceListItem = ({callbackModal, item, naviMapInfo, queryKey}) => {
                 style={styles.saveButton}
                 size="small"
                 status="warning"
-                onPress={() => doSave(item.item._id)}>
+                onPress={() => doSave(item.item._id)}
+              >
                 저장
               </Button>
             </>
