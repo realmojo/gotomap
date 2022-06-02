@@ -12,7 +12,7 @@ import useStore from '../stores';
 import {observer} from 'mobx-react';
 import {useQuery} from 'react-query';
 import {Admob, LoadingIndicator} from '../components';
-import {getPlaceCount, patchUsername} from '../api';
+import {getPlaceCount, patchUsername, setStorageName} from '../api';
 import {QUERY_KEY} from '../config/constants';
 
 export const My = observer(() => {
@@ -47,6 +47,7 @@ export const My = observer(() => {
       setIsEdit(!isEdit);
       setValue(res.name);
       userStore.setName(res.name);
+      setStorageName(res.name);
     }
   };
 
