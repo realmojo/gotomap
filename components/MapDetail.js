@@ -202,7 +202,7 @@ export const MapDetail = ({searchItem}) => {
           </ScrollView>
           <Layout level="1">
             <Button status="warning" size="large" onPress={() => doGo()}>
-              <Text style={styles.goText}>등록 </Text>
+              <Text style={styles.goText}>가봐야지 </Text>
               {isGo ? <MaterialCommunityIcons name="check" size={16} /> : ''}
             </Button>
           </Layout>

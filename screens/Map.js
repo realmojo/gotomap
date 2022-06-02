@@ -140,6 +140,7 @@ export const Map = ({navigation}) => {
         {places.length > 0 && (
           <>
             <List
+              keyboardShouldPersistTaps="always"
               style={styles.container}
               data={places}
               ItemSeparatorComponent={Divider}
